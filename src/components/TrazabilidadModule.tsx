@@ -1,17 +1,15 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Plus, Search, Filter, MapPin, Calendar, Truck, Import } from 'lucide-react';
+import { ArrowLeft, Plus, Import, Search, Filter, MapPin, Calendar, Truck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import AnimalEditSheet from './AnimalEditSheet';
-import AnimalImportSheet from './AnimalImportSheet';
+import TabsGS from '@/components/ui/TabsGS';
 import AnimalFilters from './trazabilidad/AnimalFilters';
 import AnimalCard from './trazabilidad/AnimalCard';
 import AnimalProfileSheet from './trazabilidad/AnimalProfileSheet';
 import CrearAnimalSheet from './trazabilidad/CrearAnimalSheet';
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface Animal {
   id: string;
@@ -25,6 +23,7 @@ interface Animal {
   pesoInicial?: number;
   sexo?: 'Macho' | 'Hembra';
 }
+
 interface Movimiento {
   id: number;
   animal: string;
@@ -49,16 +48,14 @@ const motivos = [
   "Otro"
 ];
 
-const TrazabilidadModule = ({ onBack }: TrazabilidadModuleProps) => {
-  const [tab, setTab] = useState<'registro' | 'movimientos'>('registro');
-  const [showMovementForm, setShowMovementForm] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [showAnimalEdit, setShowAnimalEdit] = useState(false);
-  const [animalToEdit, setAnimalToEdit] = useState<Animal | null>(null);
-  const [showImport, setShowImport] = useState(false);
-  const [showCrear, setShowCrear] = useState(false);
-  const [selectedAnimal, setSelectedAnimal] = useState<Animal | null>(null);
+const TabsConfig = [
+  { key: "registro", label: "Registro" },
+  { key: "movimientos", label: "Movimientos" },
+];
 
+const TrazabilidadModule = ({ onBack }: TrazabilidadModuleProps) => {
+  const [tab, setTab] = useState('registro');
+  const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({
     departamento: '',
     proveedor: '',
@@ -68,14 +65,18 @@ const TrazabilidadModule = ({ onBack }: TrazabilidadModuleProps) => {
     fechaIngresoFin: ''
   });
 
-  const [animals, setAnimals] = useState<Animal[]>([
+  const [showCrear, setShowCrear] = useState(false);
+  const [selectedAnimal, setSelectedAnimal] = useState<Animal | null>(null);
+  const [showMovementForm, setShowMovementForm] = useState(false);
+
+  const [animals] = useState<Animal[]>([
     { id: '00993', lote: 'A-2024', ubicacion: 'Potrero Norte', ultimoMovimiento: '2024-06-15', peso: '450 kg', departamento: 'La Paz', proveedor: 'Proveedor Uno', fechaIngreso: '2024-06-12', pesoInicial: 400, sexo: 'Macho' },
     { id: '00994', lote: 'A-2024', ubicacion: 'Potrero Sur', ultimoMovimiento: '2024-06-14', peso: '425 kg', departamento: 'Cochabamba', proveedor: 'Proveedor Dos', fechaIngreso: '2024-06-13', pesoInicial: 390, sexo: 'Hembra' },
     { id: '00995', lote: 'B-2024', ubicacion: 'Corral Central', ultimoMovimiento: '2024-06-13', peso: '380 kg', departamento: 'Santa Cruz', proveedor: 'Proveedor Tercero', fechaIngreso: '2024-06-14', pesoInicial: 420, sexo: 'Macho' },
     { id: '00996', lote: 'B-2024', ubicacion: 'Potrero Este', ultimoMovimiento: '2024-06-12', peso: '465 kg' },
     { id: '00997', lote: 'C-2024', ubicacion: 'Potrero Norte', ultimoMovimiento: '2024-06-11', peso: '440 kg' }
   ]);
-  const [movimientos, setMovimientos] = useState<Movimiento[]>([
+  const [movimientos] = useState<Movimiento[]>([
     { id: 1, animal: '00993', origen: 'Potrero Sur', destino: 'Potrero Norte', fecha: '2024-06-15', motivo: 'Rotación de pastoreo', tipo: 'Compra', detalles: 'Compra inicial' },
     { id: 2, animal: '00994', origen: 'Corral Central', destino: 'Potrero Sur', fecha: '2024-06-14', motivo: 'Finalización tratamiento', tipo: 'Traslado', detalles: 'Traslado a potrero norte' },
     { id: 3, animal: '00995', origen: 'Potrero Este', destino: 'Corral Central', fecha: '2024-06-13', motivo: 'Revisión veterinaria', tipo: 'Incidencia', detalles: 'Tratamiento veterinario' }
@@ -93,197 +94,130 @@ const TrazabilidadModule = ({ onBack }: TrazabilidadModuleProps) => {
   const filteredAnimals = animals.filter(animal => {
     const matchesSearch = animal.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       animal.lote.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesFilters = 
+    const matchesFilters =
       (!filters.departamento || animal.departamento === filters.departamento) &&
       (!filters.proveedor || animal.proveedor === filters.proveedor) &&
       (!animal.pesoInicial || animal.pesoInicial >= filters.pesoMin) &&
       (!animal.pesoInicial || animal.pesoInicial <= filters.pesoMax) &&
       (!filters.fechaIngresoIni || (animal.fechaIngreso && animal.fechaIngreso >= filters.fechaIngresoIni)) &&
       (!filters.fechaIngresoFin || (animal.fechaIngreso && animal.fechaIngreso <= filters.fechaIngresoFin));
-    
     return matchesSearch && matchesFilters;
   });
 
-  // Handler: Guardar edición de animal
-  const handleEditAnimal = (animalEdit: Animal) => {
-    setAnimals(animals => animals.map(a => a.id === animalEdit.id ? { ...a, ...animalEdit } : a));
-  };
+    // Handler: Registrar movimiento
+    const handleRegistroMovimiento = () => {
+      // Validaciones
+      const { idAnimal, origen, destino, motivo } = movForm;
+      if (!idAnimal || !origen || !destino || !motivo) {
+        setMovError("Completa todos los campos");
+        return;
+      }
+      if (origen === destino) {
+        setMovError("El destino debe ser diferente a la ubicación actual");
+        return;
+      }
+      // Buscar animal
+      const idx = animals.findIndex(a => a.id === idAnimal);
+      if (idx === -1) {
+        setMovError("Animal no encontrado");
+        return;
+      }
+      // Guardar movimiento y actualizar animal
+      const fechaHoy = new Date().toISOString().slice(0,10);
+      setMovimientos(movs => [
+        {
+          id: Math.max(0, ...movs.map(m => m.id)) + 1,
+          animal: idAnimal,
+          origen, destino, motivo,
+          fecha: fechaHoy
+        },
+        ...movs
+      ]);
+      setAnimals(animals => animals.map((a,i) => i === idx ? {
+        ...a,
+        ubicacion: destino,
+        ultimoMovimiento: fechaHoy
+      } : a));
+      setShowMovementForm(false);
+      setMovForm({
+        idAnimal: '',
+        origen: ubicaciones[0],
+        destino: ubicaciones[1],
+        motivo: motivos[0]
+      });
+      setMovError(null);
+    };
 
-  // Handler: Importación masiva
-  const handleImport = (bulk: Animal[]) => {
-    // Evitar duplicados
-    const ids = new Set(animals.map(a => a.id));
-    const nuevos = bulk.filter(a => !ids.has(a.id));
-    setAnimals(animals => [...animals, ...nuevos]);
-  };
-
-  // Handler: Registrar movimiento
-  const handleRegistroMovimiento = () => {
-    // Validaciones
-    const { idAnimal, origen, destino, motivo } = movForm;
-    if (!idAnimal || !origen || !destino || !motivo) {
-      setMovError("Completa todos los campos");
-      return;
-    }
-    if (origen === destino) {
-      setMovError("El destino debe ser diferente a la ubicación actual");
-      return;
-    }
-    // Buscar animal
-    const idx = animals.findIndex(a => a.id === idAnimal);
-    if (idx === -1) {
-      setMovError("Animal no encontrado");
-      return;
-    }
-    // Guardar movimiento y actualizar animal
-    const fechaHoy = new Date().toISOString().slice(0,10);
-    setMovimientos(movs => [
-      {
-        id: Math.max(0, ...movs.map(m => m.id)) + 1,
-        animal: idAnimal,
-        origen, destino, motivo,
-        fecha: fechaHoy
-      },
-      ...movs
-    ]);
-    setAnimals(animals => animals.map((a,i) => i === idx ? {
-      ...a,
-      ubicacion: destino,
-      ultimoMovimiento: fechaHoy
-    } : a));
-    setShowMovementForm(false);
-    setMovForm({
-      idAnimal: '',
-      origen: ubicaciones[0],
-      destino: ubicaciones[1],
-      motivo: motivos[0]
-    });
-    setMovError(null);
-  };
-
+  // ----------- UI ----------- //
   return (
-    <div className="min-h-screen bg-[#FDF8F4]">
-      <Tabs value={tab} onValueChange={v => setTab(v as any)} className="w-full max-w-xl mx-auto">
-        <TabsList className="flex justify-between items-center rounded-lg mt-0 bg-[#f0cbad] border-b border-[#ac815d] mb-2">
-          <TabsTrigger value="registro" className="flex-1 text-[18px] px-2 py-3 text-[#3a210c] data-[state=active]:bg-[#ffffff] data-[state=active]:text-[#ac815d] rounded-lg font-semibold">
-            Registro
-          </TabsTrigger>
-          <TabsTrigger value="movimientos" className="flex-1 text-[18px] px-2 py-3 text-[#3a210c] data-[state=active]:bg-[#ffffff] data-[state=active]:text-[#ac815d] rounded-lg font-semibold">
-            Movimientos
-          </TabsTrigger>
-        </TabsList>
+    <div className="min-h-screen bg-[#f0cbad]">
+      {/* Header sticky */}
+      <header className="bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-30">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <Button variant="ghost" size="icon" onClick={onBack}>
+              <ArrowLeft className="h-6 w-6 text-[#3a210c]" />
+            </Button>
+            <h1 className="text-xl font-semibold text-[#3a210c]">
+              {tab === "registro" ? "Trazabilidad" : "Movimientos"}
+            </h1>
+          </div>
+          {/* Overflow menu Excel Import */}
+          <Button variant="ghost" size="icon" aria-label="Importar Excel" className="text-[#3a210c]">
+            <Import className="h-6 w-6" />
+          </Button>
+        </div>
+      </header>
+      {/* Tabs absolute under header */}
+      <TabsGS
+        value={tab}
+        onChange={setTab}
+        tabs={TabsConfig}
+      />
 
-        {/* REGISTRO TAB */}
-        <TabsContent value="registro">
-          {/* Header */}
-          <header className="bg-white border-b border-gray-200 px-4 py-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <Button variant="ghost" size="icon" onClick={onBack}>
-                  <ArrowLeft className="h-6 w-6 text-[#3a210c]" />
-                </Button>
-                <h1 className="text-xl font-semibold text-[#3a210c]">Trazabilidad</h1>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Button variant="ghost" size="icon" onClick={() => setShowImport(true)}>
-                  <Import className="h-6 w-6 text-[#3a210c]" />
-                </Button>
-                <Button variant="ghost" size="icon">
-                  <Filter className="h-6 w-6 text-[#3a210c]" />
-                </Button>
-                <Button variant="ghost" size="icon">
-                  <Search className="h-6 w-6 text-[#3a210c]" />
-                </Button>
-              </div>
-            </div>
-          </header>
-
-          <div className="p-4 space-y-6">
-            {/* Search Bar */}
+      {/* Tab content */}
+      {tab === "registro" ? (
+        <div>
+          {/* Search bar */}
+          <div className="px-4 mt-4">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                placeholder="Buscar por ID o lote..."
+              <input
+                type="text"
+                placeholder="Buscar ID o lote…"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-white"
+                onChange={e => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-3 py-2 rounded-lg border border-[#ac815d] text-[#3a210c] bg-white placeholder:text-gray-400 font-medium text-[16px] shadow"
+                style={{ borderRadius: 8 }}
               />
-            </div>
-
-            {/* Filters (sticky row) */}
-            <div className="sticky top-[62px] z-10">
-              <AnimalFilters value={filters} onChange={setFilters} />
-            </div>
-
-            {/* Quick Stats */}
-            <div className="grid grid-cols-3 gap-3">
-              <Card className="card-shadow bg-white">
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-[#3a210c]">{animals.length}</div>
-                  <div className="text-sm text-gray-600">Total Animales</div>
-                </CardContent>
-              </Card>
-              <Card className="card-shadow bg-white">
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-[#3a210c]">{[...new Set(animals.map(a=>a.ubicacion))].length}</div>
-                  <div className="text-sm text-gray-600">Ubicaciones</div>
-                </CardContent>
-              </Card>
-              <Card className="card-shadow bg-white">
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-[#3a210c]">{movimientos.filter(m => m.fecha === new Date().toISOString().slice(0,10)).length}</div>
-                  <div className="text-sm text-gray-600">Movimientos Hoy</div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Animals List */}
-            <div>
-              <h2 className="text-lg font-semibold text-[#3a210c] mb-4">Animales</h2>
-              <div className="space-y-3">
-                {filteredAnimals.map(animal => (
-                  <Card key={animal.id} className="border border-[#ac815d] bg-white group">
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-2 mb-2">
-                            <h3 className="font-semibold text-[#3a210c]">ID: {animal.id}</h3>
-                            <span className="px-2 py-1 bg-[#f0cbad] text-[#3a210c] text-xs rounded-full">
-                              {animal.lote}
-                            </span>
-                          </div>
-                          <div className="space-y-1">
-                            <div className="flex items-center text-sm text-gray-600">
-                              <MapPin className="h-4 w-4 mr-1" />
-                              {animal.ubicacion}
-                            </div>
-                            <div className="flex items-center text-sm text-gray-600">
-                              <Calendar className="h-4 w-4 mr-1" />
-                              Último mov: {animal.ultimoMovimiento}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex flex-col items-end gap-1">
-                          <div className="font-semibold text-[#3a210c]">{animal.peso}</div>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="mt-2 border-[#ac815d] text-[#ac815d] px-2 py-1 h-7 text-xs"
-                            onClick={() => { setAnimalToEdit(animal); setShowAnimalEdit(true); }}
-                          >
-                            Editar
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#ac815d] pointer-events-none text-lg">🔍</span>
             </div>
           </div>
 
-          {/* FAB Crear */}
+          {/* Sticky Filters Row */}
+          <div className="sticky top-[110px] z-30 bg-[#f0cbad]">
+            <AnimalFilters value={filters} onChange={setFilters} />
+          </div>
+
+          {/* Listado de animales */}
+          <div className="px-4 pt-2 pb-24">
+            <h2 className="mt-2 mb-3 text-lg font-semibold text-[#3a210c]">Animales</h2>
+            <div className="space-y-3">
+              {filteredAnimals.map(animal => (
+                <AnimalCard
+                  key={animal.id}
+                  animal={animal}
+                  onClick={() => setSelectedAnimal(animal)}
+                />
+              ))}
+              {filteredAnimals.length === 0 && (
+                <div className="text-center text-[#ac815d] text-[16px] p-8 bg-white rounded-lg shadow">
+                  No se encontraron animales.
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* FAB CREAR ANIMAL */}
           <Button
             size="lg"
             className="fixed bottom-7 right-7 z-40 rounded-full bg-[#ac815d] hover:bg-[#3a210c] text-white shadow-lg w-16 h-16 flex items-center justify-center text-3xl"
@@ -296,13 +230,12 @@ const TrazabilidadModule = ({ onBack }: TrazabilidadModuleProps) => {
           {/* Crear Animal Sheet (stub) */}
           <CrearAnimalSheet open={showCrear} onClose={() => setShowCrear(false)} />
 
-          {/* Perfil de animal (sheet) (stub) */}
+          {/* Perfil de animal (sheet) */}
           <AnimalProfileSheet open={!!selectedAnimal} animal={selectedAnimal} onClose={() => setSelectedAnimal(null)} />
-        </TabsContent>
-
-        {/* MOVIMIENTOS TAB */}
-        <TabsContent value="movimientos">
-          {/* Header */}
+        </div>
+      ) : (
+        // Tab Movimientos: UI/Flow igual a la implementación existente
+        <div>
           <header className="bg-white border-b border-gray-200 px-4 py-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
@@ -312,7 +245,7 @@ const TrazabilidadModule = ({ onBack }: TrazabilidadModuleProps) => {
                 <h1 className="text-xl font-semibold text-[#3a210c]">Movimientos</h1>
               </div>
               <div className="flex items-center space-x-2">
-                <Button variant="ghost" size="icon" onClick={() => setShowImport(true)}>
+                <Button variant="ghost" size="icon">
                   <Import className="h-6 w-6 text-[#3a210c]" />
                 </Button>
                 <Button variant="ghost" size="icon">
@@ -437,23 +370,8 @@ const TrazabilidadModule = ({ onBack }: TrazabilidadModuleProps) => {
               </SheetContent>
             </Sheet>
           </div>
-        </TabsContent>
-      </Tabs>
-
-      {/* Edición animal */}
-      <AnimalEditSheet
-        open={showAnimalEdit}
-        animal={animalToEdit}
-        onClose={() => setShowAnimalEdit(false)}
-        onSave={handleEditAnimal}
-      />
-
-      {/* Importación */}
-      <AnimalImportSheet
-        open={showImport}
-        onClose={() => setShowImport(false)}
-        onImport={handleImport}
-      />
+        </div>
+      )}
     </div>
   );
 };
