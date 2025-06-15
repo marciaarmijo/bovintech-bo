@@ -18,26 +18,22 @@ const MainApp = () => {
     {
       id: 'trazabilidad',
       title: 'Trazabilidad',
-      icon: '/lovable-uploads/971a2a52-95fd-42f6-b39c-380f8db46647.png',
-      description: 'Gestión de animales'
+      icon: '/lovable-uploads/971a2a52-95fd-42f6-b39c-380f8db46647.png'
     },
     {
       id: 'sanidad',
       title: 'Gestión Sanitaria',
-      icon: '/lovable-uploads/c63c2cd7-0428-4558-b822-b46447863975.png',
-      description: 'Control de salud'
+      icon: '/lovable-uploads/c63c2cd7-0428-4558-b822-b46447863975.png'
     },
     {
       id: 'peso',
       title: 'Monitoreo de Peso',
-      icon: '/lovable-uploads/9adfd864-ba52-4ec8-bafc-c4900c5b98d9.png',
-      description: 'Control de peso'
+      icon: '/lovable-uploads/9adfd864-ba52-4ec8-bafc-c4900c5b98d9.png'
     },
     {
       id: 'finanzas',
       title: 'Análisis Financiero',
-      icon: '/lovable-uploads/9d9ec8ea-0bc4-43c2-ad0a-76b0525d6cac.png',
-      description: 'Gestión económica'
+      icon: '/lovable-uploads/9d9ec8ea-0bc4-43c2-ad0a-76b0525d6cac.png'
     }
   ];
 
@@ -56,12 +52,6 @@ const MainApp = () => {
       { id: 'trabajadores', title: 'Trabajadores', icon: 'users' }
     ]
   };
-
-  const quickActions = [
-    { title: 'Registrar animal', action: () => setCurrentModule('trazabilidad') },
-    { title: 'Registrar peso', action: () => setCurrentModule('peso') },
-    { title: 'Programar vacuna', action: () => setCurrentModule('sanidad') }
-  ];
 
   const recentAlerts = [
     { id: 1, title: 'Vacunación pendiente', subtitle: 'Animal 00993 - Fiebre aftosa', time: '2 horas' },
@@ -201,32 +191,31 @@ const MainApp = () => {
           </div>
         </header>
 
-        <div className="p-4 space-y-6">
-          {/* Main Modules Grid - takes ~80% height */}
-          <div className="grid grid-cols-2 gap-4" style={{ minHeight: '60vh' }}>
+        <div className="p-4 space-y-8">
+          {/* Main Modules Grid - Now takes full priority */}
+          <div className="grid grid-cols-2 gap-6" style={{ minHeight: '70vh' }}>
             {modules.map((module) => (
               <Card 
                 key={module.id} 
                 className="card-shadow border border-[#ac815d] hover:shadow-lg bovin-transition cursor-pointer"
                 onClick={() => setCurrentModule(module.id)}
               >
-                <CardContent className="p-6 text-center h-full flex flex-col justify-center">
-                  <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                <CardContent className="p-8 text-center h-full flex flex-col justify-center">
+                  <div className="w-20 h-20 mx-auto mb-6 flex items-center justify-center">
                     <img 
                       src={module.icon} 
                       alt={module.title} 
-                      className="w-12 h-12 object-contain"
+                      className="w-16 h-16 object-contain"
                     />
                   </div>
-                  <h3 className="font-semibold text-[#3a210c] mb-2 text-lg">{module.title}</h3>
-                  <p className="text-sm text-[#ac815d]">{module.description}</p>
+                  <h3 className="font-semibold text-[#3a210c] text-lg">{module.title}</h3>
                 </CardContent>
               </Card>
             ))}
           </div>
 
-          {/* Alertas Strip - bottom 15% height */}
-          <div className="bg-[#f0cbad] rounded-lg p-4" style={{ minHeight: '15vh' }}>
+          {/* Alertas Strip - Now positioned lower */}
+          <div className="bg-[#f0cbad] rounded-lg p-4">
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-lg font-semibold text-[#3a210c]">Alertas</h2>
               <button className="text-sm text-[#3a210c] hover:underline">Ver todas</button>
@@ -240,23 +229,6 @@ const MainApp = () => {
                   </div>
                   <span className="text-xs text-[#3a210c] opacity-60">{alert.time}</span>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Accesos Rápidos */}
-          <div>
-            <h2 className="text-lg font-semibold text-[#3a210c] mb-4">Accesos Rápidos</h2>
-            <div className="flex flex-wrap gap-2">
-              {quickActions.map((action, index) => (
-                <Button
-                  key={index}
-                  variant="outline"
-                  onClick={action.action}
-                  className="rounded-full border-[#ac815d] text-[#3a210c] hover:bg-[#f0cbad] bovin-transition"
-                >
-                  {action.title}
-                </Button>
               ))}
             </div>
           </div>
