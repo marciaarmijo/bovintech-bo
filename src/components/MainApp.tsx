@@ -14,6 +14,7 @@ import AlertasScreen from './AlertasScreen';
 import ConectividadIoTScreen from './ConectividadIoTScreen';
 import TrabajadoresScreen from './TrabajadoresScreen';
 import TutorialesScreen from './TutorialesScreen';
+import PerfilScreen from "./PerfilScreen";
 
 const MainApp = () => {
   const [currentModule, setCurrentModule] = useState<string>('home');
@@ -134,6 +135,10 @@ const MainApp = () => {
     return <TutorialesScreen onBack={() => setCurrentModule('home')} />;
   }
 
+  if (currentModule === 'perfil') {
+    return <PerfilScreen onBack={() => setCurrentModule('home')} />;
+  }
+
   return (
     <OfflineManager>
       <div className="min-h-screen bg-[#ac815d]">
@@ -240,7 +245,10 @@ const MainApp = () => {
                     </div>
 
                     <div className="absolute bottom-0 left-0 right-0 p-4 border-t">
-                      <button className="w-full flex items-center space-x-3 px-3 py-2 text-left hover:bg-gray-100 rounded-lg bovin-transition">
+                      <button
+                        className="w-full flex items-center space-x-3 px-3 py-2 text-left hover:bg-gray-100 rounded-lg bovin-transition"
+                        onClick={() => { setCurrentModule('perfil'); setIsDrawerOpen(false); }}
+                      >
                         <img 
                           src="/lovable-uploads/bca22938-9c67-4898-ab34-55d85ff2873f.png"
                           alt="Perfil"
