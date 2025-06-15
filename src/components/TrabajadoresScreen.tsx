@@ -1,14 +1,12 @@
 
 import React, { useState } from 'react';
-import { ArrowLeft, Search, Plus, MoreVertical, Trash2, Mail } from 'lucide-react';
+import { ArrowLeft, Search, Plus, MoreVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
 
 interface TrabajadoresScreenProps {
@@ -16,90 +14,44 @@ interface TrabajadoresScreenProps {
 }
 
 const TrabajadoresScreen = ({ onBack }: TrabajadoresScreenProps) => {
-  const { toast } = useToast();
+  const [showInviteForm, setShowInviteForm] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
-  const [newWorkerName, setNewWorkerName] = useState('');
-  const [newWorkerEmail, setNewWorkerEmail] = useState('');
-  const [sendInvitation, setSendInvitation] = useState(true);
+  const [formData, setFormData] = useState({
+    nombre: '',
+    email: '',
+    enviarInvitacion: true
+  });
+  const { toast } = useToast();
 
-  const workers = [
-    {
-      id: 1,
-      name: 'Carlos Rodríguez',
-      email: 'carlos@finca.com',
-      initials: 'CR',
-      status: 'active'
-    },
-    {
-      id: 2,
-      name: 'María González',
-      email: 'maria@finca.com',
-      initials: 'MG',
-      status: 'pending'
-    },
-    {
-      id: 3,
-      name: 'José Martínez',
-      email: 'jose@finca.com',
-      initials: 'JM',
-      status: 'active'
-    },
-    {
-      id: 4,
-      name: 'Ana López',
-      email: 'ana@finca.com',
-      initials: 'AL',
-      status: 'active'
-    },
-    {
-      id: 5,
-      name: 'Pedro Sánchez',
-      email: 'pedro@finca.com',
-      initials: 'PS',
-      status: 'pending'
-    }
+  const trabajadores = [
+    { id: 1, nombre: 'Juan Pérez', email: 'juan@finca.com', iniciales: 'JP' },
+    { id: 2, nombre: 'María García', email: 'maria@finca.com', iniciales: 'MG' },
+    { id: 3, nombre: 'Carlos López', email: 'carlos@finca.com', iniciales: 'CL' },
+    { id: 4, nombre: 'Ana Martínez', email: 'ana@finca.com', iniciales: 'AM' }
   ];
 
-  const filteredWorkers = workers.filter(worker =>
-    worker.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    worker.email.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredTrabajadores = trabajadores.filter(t => 
+    t.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    t.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleInviteWorker = () => {
-    if (!newWorkerName || !newWorkerEmail) {
+  const handleInvite = () => {
+    if (!formData.nombre.trim() || !formData.email.trim()) {
       toast({
         title: "Error",
         description: "Por favor completa todos los campos requeridos",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
 
     toast({
       title: "Invitación enviada",
-      description: `Invitación enviada a ${newWorkerEmail}`,
+      description: `Invitación enviada a ${formData.email}`,
     });
 
-    setIsInviteDialogOpen(false);
-    setNewWorkerName('');
-    setNewWorkerEmail('');
-    setSendInvitation(true);
-  };
-
-  const handleResendInvitation = (email: string) => {
-    toast({
-      title: "Invitación reenviada",
-      description: `Invitación reenviada a ${email}`,
-    });
-  };
-
-  const handleDeleteWorker = (name: string) => {
-    toast({
-      title: "Trabajador eliminado",
-      description: `${name} ha sido eliminado de la finca`,
-      variant: "destructive",
-    });
+    setFormData({ nombre: '', email: '', enviarInvitacion: true });
+    setShowInviteForm(false);
   };
 
   return (
@@ -113,127 +65,103 @@ const TrabajadoresScreen = ({ onBack }: TrabajadoresScreenProps) => {
             </Button>
             <h1 className="text-xl font-semibold text-[#3a210c]">Trabajadores</h1>
           </div>
-          <Button variant="ghost" size="icon" className="text-[#3a210c]">
-            <Search className="h-6 w-6" />
+          <Button variant="ghost" size="icon">
+            <Search className="h-6 w-6 text-[#3a210c]" />
           </Button>
         </div>
       </header>
 
+      {/* Search */}
       <div className="p-4">
-        {/* Search bar */}
-        <div className="mb-6">
-          <Input
-            placeholder="Buscar trabajadores..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full"
-          />
-        </div>
-
-        {/* Workers list */}
-        <div className="space-y-3 mb-20">
-          {filteredWorkers.map((worker) => (
-            <Card key={worker.id} className="border border-gray-200">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <Avatar className="h-10 w-10">
-                      <AvatarFallback className="bg-[#ac815d] text-white">
-                        {worker.initials}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <h3 className="font-medium text-[#3a210c]">{worker.name}</h3>
-                      <p className="text-sm text-gray-600">{worker.email}</p>
-                      {worker.status === 'pending' && (
-                        <span className="text-xs text-yellow-600 bg-yellow-50 px-2 py-1 rounded-full">
-                          Pendiente
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      {worker.status === 'pending' && (
-                        <DropdownMenuItem onClick={() => handleResendInvitation(worker.email)}>
-                          <Mail className="h-4 w-4 mr-2" />
-                          Reenviar invitación
-                        </DropdownMenuItem>
-                      )}
-                      <DropdownMenuItem 
-                        onClick={() => handleDeleteWorker(worker.name)}
-                        className="text-red-600"
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Eliminar
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <Input
+          placeholder="Buscar trabajadores..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full"
+        />
       </div>
 
-      {/* FAB - Invitar trabajador */}
-      <Dialog open={isInviteDialogOpen} onOpenChange={setIsInviteDialogOpen}>
-        <DialogTrigger asChild>
-          <Button
-            className="fixed bottom-6 right-6 h-14 w-14 rounded-full bg-[#ac815d] hover:bg-[#8d6b47] text-white shadow-lg"
-            size="icon"
-          >
-            <Plus className="h-6 w-6" />
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-[#3a210c]">Invitar trabajador</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="workerName">Nombre *</Label>
-              <Input
-                id="workerName"
-                placeholder="Nombre completo"
-                value={newWorkerName}
-                onChange={(e) => setNewWorkerName(e.target.value)}
-              />
-            </div>
-            <div>
-              <Label htmlFor="workerEmail">Email *</Label>
-              <Input
-                id="workerEmail"
-                type="email"
-                placeholder="correo@ejemplo.com"
-                value={newWorkerEmail}
-                onChange={(e) => setNewWorkerEmail(e.target.value)}
-              />
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="sendInvitation"
-                checked={sendInvitation}
-                onCheckedChange={setSendInvitation}
-              />
-              <Label htmlFor="sendInvitation" className="text-sm">
-                Enviar invitación por email
-              </Label>
-            </div>
+      {/* Workers List */}
+      <div className="px-4 space-y-3">
+        {filteredTrabajadores.map(trabajador => (
+          <Card key={trabajador.id} className="border-l-4 border-l-[#ac815d]">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-12 h-12 bg-[#ac815d] rounded-full flex items-center justify-center">
+                    <span className="text-white font-medium">{trabajador.iniciales}</span>
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-[#3a210c]">{trabajador.nombre}</h4>
+                    <p className="text-sm text-gray-600">{trabajador.email}</p>
+                  </div>
+                </div>
+                <Button variant="ghost" size="icon">
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* FAB */}
+      <div className="fixed bottom-6 right-6">
+        <Sheet open={showInviteForm} onOpenChange={setShowInviteForm}>
+          <SheetTrigger asChild>
             <Button 
-              onClick={handleInviteWorker}
-              className="w-full bg-[#ac815d] hover:bg-[#8d6b47] text-white"
+              size="lg" 
+              className="rounded-full bg-[#ac815d] hover:bg-[#3a210c] text-white fab-shadow"
             >
-              Invitar
+              <Plus className="h-6 w-6" />
             </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+          </SheetTrigger>
+          <SheetContent side="bottom" className="h-[70vh]">
+            <SheetHeader>
+              <SheetTitle className="text-[#3a210c]">Invitar trabajador</SheetTitle>
+            </SheetHeader>
+            
+            <div className="p-4 space-y-4">
+              <div>
+                <Label className="text-[#3a210c]">Nombre *</Label>
+                <Input 
+                  placeholder="Nombre completo"
+                  value={formData.nombre}
+                  onChange={(e) => setFormData({...formData, nombre: e.target.value})}
+                  className="mt-1" 
+                />
+              </div>
+
+              <div>
+                <Label className="text-[#3a210c]">Email *</Label>
+                <Input 
+                  type="email"
+                  placeholder="email@ejemplo.com"
+                  value={formData.email}
+                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  className="mt-1" 
+                />
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="enviar"
+                  checked={formData.enviarInvitacion}
+                  onCheckedChange={(checked) => setFormData({...formData, enviarInvitacion: checked === true})}
+                />
+                <Label htmlFor="enviar" className="text-[#3a210c]">Enviar invitación</Label>
+              </div>
+
+              <Button 
+                onClick={handleInvite}
+                className="w-full bg-[#ac815d] hover:bg-[#3a210c] text-white"
+              >
+                Invitar
+              </Button>
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
     </div>
   );
 };
