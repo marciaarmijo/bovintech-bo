@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ArrowLeft, Plus, DollarSign, TrendingUp, Filter, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -63,7 +62,7 @@ const AnalisisFinancieroModule = ({ onBack }: AnalisisFinancieroModuleProps) => 
   };
 
   return (
-    <div className="min-h-screen bg-[#F1D2B9]">
+    <div className="min-h-screen bg-[#FDF8F4]">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 px-4 py-3">
         <div className="flex items-center justify-between">
