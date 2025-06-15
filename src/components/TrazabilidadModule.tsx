@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { ArrowLeft, Plus, Search, Filter, MapPin, Calendar, Truck, Import } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,11 +8,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AnimalEditSheet from './AnimalEditSheet';
 import AnimalImportSheet from './AnimalImportSheet';
-import { AnimalCard } from "./trazabilidad/AnimalCard";
-import { AnimalFilterBar } from "./trazabilidad/AnimalFilterBar";
-import { AnimalCreateFAB } from "./trazabilidad/AnimalCreateFAB";
-import { AnimalOverflowMenu } from "./trazabilidad/AnimalOverflowMenu";
-import { toastES } from "./trazabilidad/ToastES";
 
 interface Animal {
   id: string;
@@ -42,11 +38,6 @@ const motivos = [
   "Otro"
 ];
 
-// Estado global de modal
-const departamentosFicticios = ["Santa Cruz", "Beni", "Cochabamba", "Tarija"];
-const proveedoresFicticios = ["Ganadero Norte", "Agropecuaria Sur", "Estancia Este", "AgroBeni Sur"];
-const initPeso = [100, 700];
-
 const TrazabilidadModule = ({ onBack }: TrazabilidadModuleProps) => {
   const [showMovementForm, setShowMovementForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -76,24 +67,10 @@ const TrazabilidadModule = ({ onBack }: TrazabilidadModuleProps) => {
   });
   const [movError, setMovError] = useState<string|null>(null);
 
-  // Añadir estados de filtro rápido:
-  const [procedencia, setProcedencia] = useState("");
-  const [pesoFiltro, setPesoFiltro] = useState<[number, number]>(initPeso);
-  const [fechaFiltro, setFechaFiltro] = useState<[Date|undefined, Date|undefined]>([undefined, undefined]);
-  const [modalImportOpen, setModalImportOpen] = useState(false);
-  const [showAnimalCreate, setShowAnimalCreate] = useState(false);
-
-  // Búsqueda/filtros combinados (simplificado para la demo)
-  const filteredAnimals = animals.filter(animal => {
-    const m1 = !searchTerm || animal.id.toLowerCase().includes(searchTerm.toLowerCase());
-    const m2 = !procedencia || animal.lote?.toLowerCase().includes(procedencia.toLowerCase());
-    const m3 = Number(animal.peso) >= pesoFiltro[0] && Number(animal.peso) <= pesoFiltro[1];
-    const m4 = !fechaFiltro[0] || !fechaFiltro[1] || (
-      animal.ultimoMovimiento >= fechaFiltro[0].toISOString().slice(0,10) &&
-      animal.ultimoMovimiento <= fechaFiltro[1].toISOString().slice(0,10)
-    );
-    return m1 && m2 && m3 && m4;
-  });
+  const filteredAnimals = animals.filter(animal => 
+    animal.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    animal.lote.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   // Handler: Guardar edición de animal
   const handleEditAnimal = (animalEdit: Animal) => {
@@ -152,53 +129,140 @@ const TrazabilidadModule = ({ onBack }: TrazabilidadModuleProps) => {
     setMovError(null);
   };
 
-  // HANDLERS
-  const handleAnimalCreate = (nuevoAnimal: Animal) => {
-    setAnimals(animals => [...animals, nuevoAnimal]);
-    toastES.animalCreado();
-  }
-
   return (
-    <div className="min-h-screen bg-[#FDF8F4] relative">
+    <div className="min-h-screen bg-[#FDF8F4]">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-30">
-        <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="icon" onClick={onBack}>
-            <ArrowLeft className="h-6 w-6 text-[#3a210c]" />
-          </Button>
-          <img src="/icon_trazabilidad.png" alt="" className="w-10 h-10 hidden sm:block" />
-          <h1 className="text-xl font-semibold text-[#3a210c]">Trazabilidad</h1>
+      <header className="bg-white border-b border-gray-200 px-4 py-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <Button variant="ghost" size="icon" onClick={onBack}>
+              <ArrowLeft className="h-6 w-6 text-[#3a210c]" />
+            </Button>
+            <h1 className="text-xl font-semibold text-[#3a210c]">Trazabilidad</h1>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button variant="ghost" size="icon" onClick={() => setShowImport(true)}>
+              <Import className="h-6 w-6 text-[#3a210c]" />
+            </Button>
+            <Button variant="ghost" size="icon">
+              <Filter className="h-6 w-6 text-[#3a210c]" />
+            </Button>
+            <Button variant="ghost" size="icon">
+              <Search className="h-6 w-6 text-[#3a210c]" />
+            </Button>
+          </div>
         </div>
-        <AnimalOverflowMenu onImport={() => setModalImportOpen(true)} />
       </header>
 
-      {/* Filtros sticky */}
-      <div className="px-4 pt-4 sticky top-[57px] z-10">
-        <AnimalFilterBar
-          search={searchTerm}
-          onSearch={setSearchTerm}
-          procedencia={procedencia}
-          onProcedencia={setProcedencia}
-          peso={pesoFiltro}
-          onPeso={setPesoFiltro}
-          fecha={fechaFiltro}
-          onFecha={setFechaFiltro}
-          departamentos={departamentosFicticios}
-          proveedores={proveedoresFicticios}
-        />
-      </div>
+      <div className="p-4 space-y-6">
+        {/* Search Bar */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <Input
+            placeholder="Buscar por ID o lote..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 bg-white"
+          />
+        </div>
 
-      {/* Lista de animales */}
-      <div className="px-4 pt-4 pb-24 grid grid-cols-2 sm:grid-cols-4 gap-4">
-        {filteredAnimals.map(animal =>
-          <AnimalCard key={animal.id} id={animal.id} onClick={() => {/*abrir drawer perfil animal*/}} />
-        )}
-        {filteredAnimals.length === 0 && (
-          <div className="col-span-2 text-[#3a210c] text-center py-5">Sin resultados.</div>
-        )}
-      </div>
+        {/* Quick Stats */}
+        <div className="grid grid-cols-3 gap-3">
+          <Card className="card-shadow bg-white">
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-[#3a210c]">{animals.length}</div>
+              <div className="text-sm text-gray-600">Total Animales</div>
+            </CardContent>
+          </Card>
+          <Card className="card-shadow bg-white">
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-[#3a210c]">{[...new Set(animals.map(a=>a.ubicacion))].length}</div>
+              <div className="text-sm text-gray-600">Ubicaciones</div>
+            </CardContent>
+          </Card>
+          <Card className="card-shadow bg-white">
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-[#3a210c]">{movimientos.filter(m => m.fecha === new Date().toISOString().slice(0,10)).length}</div>
+              <div className="text-sm text-gray-600">Movimientos Hoy</div>
+            </CardContent>
+          </Card>
+        </div>
 
-      <AnimalCreateFAB onClick={() => setShowAnimalCreate(true)} />
+        {/* Animals List */}
+        <div>
+          <h2 className="text-lg font-semibold text-[#3a210c] mb-4">Animales</h2>
+          <div className="space-y-3">
+            {filteredAnimals.map(animal => (
+              <Card key={animal.id} className="border border-[#ac815d] bg-white group">
+                <CardContent className="p-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <h3 className="font-semibold text-[#3a210c]">ID: {animal.id}</h3>
+                        <span className="px-2 py-1 bg-[#f0cbad] text-[#3a210c] text-xs rounded-full">
+                          {animal.lote}
+                        </span>
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex items-center text-sm text-gray-600">
+                          <MapPin className="h-4 w-4 mr-1" />
+                          {animal.ubicacion}
+                        </div>
+                        <div className="flex items-center text-sm text-gray-600">
+                          <Calendar className="h-4 w-4 mr-1" />
+                          Último mov: {animal.ultimoMovimiento}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-end gap-1">
+                      <div className="font-semibold text-[#3a210c]">{animal.peso}</div>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="mt-2 border-[#ac815d] text-[#ac815d] px-2 py-1 h-7 text-xs"
+                        onClick={() => { setAnimalToEdit(animal); setShowAnimalEdit(true); }}
+                      >
+                        Editar
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Recent Movements */}
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-[#3a210c]">Movimientos Recientes</h2>
+            <button className="text-sm text-[#ac815d] hover:underline">Ver todos</button>
+          </div>
+          <div className="space-y-3">
+            {movimientos.slice(0, 5).map(movimiento => (
+              <Card key={movimiento.id} className="bg-white">
+                <CardContent className="p-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2 mb-1">
+                        <Truck className="h-4 w-4 text-[#ac815d]" />
+                        <h4 className="font-medium text-[#3a210c]">Animal {movimiento.animal}</h4>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-1">
+                        {movimiento.origen} → {movimiento.destino}
+                      </p>
+                      <p className="text-xs text-gray-400">{movimiento.motivo}</p>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-xs text-gray-500">{movimiento.fecha}</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
 
       {/* FAB */}
       <div className="fixed bottom-6 right-6">
