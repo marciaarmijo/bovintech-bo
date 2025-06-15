@@ -7,7 +7,6 @@ interface Props {
   onClose: () => void;
 }
 
-// Stub component for sliding profile sheet/drawer
 const AnimalProfileSheet: React.FC<Props> = ({ open, animal, onClose }) => {
   if (!open || !animal) return null;
   return (

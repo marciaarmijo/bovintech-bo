@@ -7,6 +7,7 @@ import AnimalFilters from './trazabilidad/AnimalFilters';
 import AnimalCard from './trazabilidad/AnimalCard';
 import AnimalProfileSheet from './trazabilidad/AnimalProfileSheet';
 import CrearAnimalSheet from './trazabilidad/CrearAnimalSheet';
+import AnimalImportSheet from './trazabilidad/AnimalImportSheet';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -65,24 +66,24 @@ const TrazabilidadModule = ({ onBack }: TrazabilidadModuleProps) => {
     fechaIngresoFin: ''
   });
 
-  const [showCrear, setShowCrear] = useState(false);
-  const [selectedAnimal, setSelectedAnimal] = useState<Animal | null>(null);
-  const [showMovementForm, setShowMovementForm] = useState(false);
-
-  const [animals] = useState<Animal[]>([
+  // Ahora sí serán estados mutables
+  const [animals, setAnimals] = useState<Animal[]>([
     { id: '00993', lote: 'A-2024', ubicacion: 'Potrero Norte', ultimoMovimiento: '2024-06-15', peso: '450 kg', departamento: 'La Paz', proveedor: 'Proveedor Uno', fechaIngreso: '2024-06-12', pesoInicial: 400, sexo: 'Macho' },
     { id: '00994', lote: 'A-2024', ubicacion: 'Potrero Sur', ultimoMovimiento: '2024-06-14', peso: '425 kg', departamento: 'Cochabamba', proveedor: 'Proveedor Dos', fechaIngreso: '2024-06-13', pesoInicial: 390, sexo: 'Hembra' },
     { id: '00995', lote: 'B-2024', ubicacion: 'Corral Central', ultimoMovimiento: '2024-06-13', peso: '380 kg', departamento: 'Santa Cruz', proveedor: 'Proveedor Tercero', fechaIngreso: '2024-06-14', pesoInicial: 420, sexo: 'Macho' },
-    { id: '00996', lote: 'B-2024', ubicacion: 'Potrero Este', ultimoMovimiento: '2024-06-12', peso: '465 kg' },
-    { id: '00997', lote: 'C-2024', ubicacion: 'Potrero Norte', ultimoMovimiento: '2024-06-11', peso: '440 kg' }
+    { id: '00996', lote: 'B-2024', ubicacion: 'Potrero Este', ultimoMovimiento: '2024-06-12', peso: '465 kg', departamento: 'Oruro', proveedor: 'Proveedor Cuatro', fechaIngreso: '2024-06-12', pesoInicial: 410, sexo: 'Hembra' },
+    { id: '00997', lote: 'C-2024', ubicacion: 'Potrero Norte', ultimoMovimiento: '2024-06-11', peso: '440 kg', departamento: 'La Paz', proveedor: 'Proveedor Uno', fechaIngreso: '2024-06-11', pesoInicial: 420, sexo: 'Macho' }
   ]);
-  const [movimientos] = useState<Movimiento[]>([
+  const [movimientos, setMovimientos] = useState<Movimiento[]>([
     { id: 1, animal: '00993', origen: 'Potrero Sur', destino: 'Potrero Norte', fecha: '2024-06-15', motivo: 'Rotación de pastoreo', tipo: 'Compra', detalles: 'Compra inicial' },
     { id: 2, animal: '00994', origen: 'Corral Central', destino: 'Potrero Sur', fecha: '2024-06-14', motivo: 'Finalización tratamiento', tipo: 'Traslado', detalles: 'Traslado a potrero norte' },
     { id: 3, animal: '00995', origen: 'Potrero Este', destino: 'Corral Central', fecha: '2024-06-13', motivo: 'Revisión veterinaria', tipo: 'Incidencia', detalles: 'Tratamiento veterinario' }
   ]);
+  const [showCrear, setShowCrear] = useState(false);
+  const [showImport, setShowImport] = useState(false);
 
-  // Movimiento form states
+  const [selectedAnimal, setSelectedAnimal] = useState<Animal | null>(null);
+  const [showMovementForm, setShowMovementForm] = useState(false);
   const [movForm, setMovForm] = useState({
     idAnimal: '',
     origen: ubicaciones[0],
@@ -104,53 +105,70 @@ const TrazabilidadModule = ({ onBack }: TrazabilidadModuleProps) => {
     return matchesSearch && matchesFilters;
   });
 
-    // Handler: Registrar movimiento
-    const handleRegistroMovimiento = () => {
-      // Validaciones
-      const { idAnimal, origen, destino, motivo } = movForm;
-      if (!idAnimal || !origen || !destino || !motivo) {
-        setMovError("Completa todos los campos");
-        return;
-      }
-      if (origen === destino) {
-        setMovError("El destino debe ser diferente a la ubicación actual");
-        return;
-      }
-      // Buscar animal
-      const idx = animals.findIndex(a => a.id === idAnimal);
-      if (idx === -1) {
-        setMovError("Animal no encontrado");
-        return;
-      }
-      // Guardar movimiento y actualizar animal
-      const fechaHoy = new Date().toISOString().slice(0,10);
-      setMovimientos(movs => [
-        {
-          id: Math.max(0, ...movs.map(m => m.id)) + 1,
-          animal: idAnimal,
-          origen, destino, motivo,
-          fecha: fechaHoy
-        },
-        ...movs
-      ]);
-      setAnimals(animals => animals.map((a,i) => i === idx ? {
-        ...a,
-        ubicacion: destino,
-        ultimoMovimiento: fechaHoy
-      } : a));
-      setShowMovementForm(false);
-      setMovForm({
-        idAnimal: '',
-        origen: ubicaciones[0],
-        destino: ubicaciones[1],
-        motivo: motivos[0]
-      });
-      setMovError(null);
-    };
+  // ---- Handlers ----
+  // Crear animal
+  const handleCrearAnimal = (animal: any) => {
+    setAnimals(prev => [
+      { ...animal, peso: animal.pesoCompra+" kg", sexo: animal.sexo },
+      ...prev
+    ]);
+  };
+
+  // Importar animales desde Excel/CSV
+  const handleImport = (animales: any[]) => {
+    setAnimals(prev => [
+      ...animales.map(a => ({ ...a, peso: a.peso+" kg", departamento: "", proveedor: "", sexo:"Macho" })),
+      ...prev
+    ]);
+  };
+
+  // Registrar movimiento (igual que antes)
+  const handleRegistroMovimiento = () => {
+    // Validaciones
+    const { idAnimal, origen, destino, motivo } = movForm;
+    if (!idAnimal || !origen || !destino || !motivo) {
+      setMovError("Completa todos los campos");
+      return;
+    }
+    if (origen === destino) {
+      setMovError("El destino debe ser diferente a la ubicación actual");
+      return;
+    }
+    // Buscar animal
+    const idx = animals.findIndex(a => a.id === idAnimal);
+    if (idx === -1) {
+      setMovError("Animal no encontrado");
+      return;
+    }
+    // Guardar movimiento y actualizar animal
+    const fechaHoy = new Date().toISOString().slice(0,10);
+    setMovimientos(movs => [
+      {
+        id: Math.max(0, ...movs.map(m => m.id)) + 1,
+        animal: idAnimal,
+        origen, destino, motivo,
+        fecha: fechaHoy
+      },
+      ...movs
+    ]);
+    setAnimals(animals => animals.map((a,i) => i === idx ? {
+      ...a,
+      ubicacion: destino,
+      ultimoMovimiento: fechaHoy
+    } : a));
+    setShowMovementForm(false);
+    setMovForm({
+      idAnimal: '',
+      origen: ubicaciones[0],
+      destino: ubicaciones[1],
+      motivo: motivos[0]
+    });
+    setMovError(null);
+  };
 
   // ----------- UI ----------- //
   return (
-    <div className="min-h-screen bg-[#f0cbad]">
+    <div className="min-h-screen bg-[#f8e7d4]">
       {/* Header sticky */}
       <header className="bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-30">
         <div className="flex items-center justify-between">
@@ -163,17 +181,25 @@ const TrazabilidadModule = ({ onBack }: TrazabilidadModuleProps) => {
             </h1>
           </div>
           {/* Overflow menu Excel Import */}
-          <Button variant="ghost" size="icon" aria-label="Importar Excel" className="text-[#3a210c]">
+          <Button variant="ghost" size="icon" aria-label="Importar Excel" className="text-[#3a210c]" onClick={() => setShowImport(true)}>
             <Import className="h-6 w-6" />
           </Button>
         </div>
       </header>
-      {/* Tabs absolute under header */}
+      {/* Tabs */}
       <TabsGS
         value={tab}
         onChange={setTab}
-        tabs={TabsConfig}
+        tabs={[
+          { key: "registro", label: "Registro" },
+          { key: "movimientos", label: "Movimientos" },
+        ]}
       />
+
+      {/* Sheets */}
+      <CrearAnimalSheet open={showCrear} onClose={() => setShowCrear(false)} onCreate={handleCrearAnimal} lotes={[...new Set(animals.map(a=>a.lote))]} />
+      <AnimalImportSheet open={showImport} onClose={() => setShowImport(false)} onImport={handleImport} />
+      <AnimalProfileSheet open={!!selectedAnimal} animal={selectedAnimal} onClose={()=>setSelectedAnimal(null)} />
 
       {/* Tab content */}
       {tab === "registro" ? (
@@ -193,15 +219,15 @@ const TrazabilidadModule = ({ onBack }: TrazabilidadModuleProps) => {
             </div>
           </div>
 
-          {/* Sticky Filters Row */}
-          <div className="sticky top-[110px] z-30 bg-[#f0cbad]">
+          {/* Sticky Filters */}
+          <div className="sticky top-[110px] z-30 bg-[#f8e7d4]">
             <AnimalFilters value={filters} onChange={setFilters} />
           </div>
 
           {/* Listado de animales */}
-          <div className="px-4 pt-2 pb-24">
+          <div className="px-4 pt-2 pb-28">
             <h2 className="mt-2 mb-3 text-lg font-semibold text-[#3a210c]">Animales</h2>
-            <div className="space-y-3">
+            <div className="flex flex-col gap-4">
               {filteredAnimals.map(animal => (
                 <AnimalCard
                   key={animal.id}
@@ -227,11 +253,6 @@ const TrazabilidadModule = ({ onBack }: TrazabilidadModuleProps) => {
           >
             <Plus className="w-8 h-8" />
           </Button>
-          {/* Crear Animal Sheet (stub) */}
-          <CrearAnimalSheet open={showCrear} onClose={() => setShowCrear(false)} />
-
-          {/* Perfil de animal (sheet) */}
-          <AnimalProfileSheet open={!!selectedAnimal} animal={selectedAnimal} onClose={() => setSelectedAnimal(null)} />
         </div>
       ) : (
         // Tab Movimientos: UI/Flow igual a la implementación existente
