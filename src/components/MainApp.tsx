@@ -147,7 +147,15 @@ const MainApp = () => {
                               }}
                               className="w-full flex items-center space-x-3 px-3 py-2 text-left hover:bg-gray-100 rounded-lg bovin-transition"
                             >
-                              <img src={item.icon} alt="" className="w-5 h-5" />
+                              <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#f7e9db] border border-[#e2cbb2]">
+                                <img
+                                  src={item.icon}
+                                  alt=""
+                                  className="w-5 h-5 object-contain"
+                                  style={{ display: "block" }}
+                                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.border = '1px solid red'; }}
+                                />
+                              </span>
                               <span className="text-[#3a210c]">{item.title}</span>
                             </button>
                           ))}
@@ -168,7 +176,15 @@ const MainApp = () => {
                               }}
                               className="w-full flex items-center space-x-3 px-3 py-2 text-left hover:bg-gray-100 rounded-lg bovin-transition"
                             >
-                              <img src={item.icon} alt="" className="w-5 h-5" />
+                              <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#f7e9db] border border-[#e2cbb2]">
+                                <img
+                                  src={item.icon}
+                                  alt=""
+                                  className="w-5 h-5 object-contain"
+                                  style={{ display: "block" }}
+                                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.border = '1px solid red'; }}
+                                />
+                              </span>
                               <span className="text-[#3a210c]">{item.title}</span>
                             </button>
                           ))}
@@ -187,7 +203,15 @@ const MainApp = () => {
                               }}
                               className="w-full flex items-center space-x-3 px-3 py-2 text-left hover:bg-gray-100 rounded-lg bovin-transition"
                             >
-                              <img src={item.icon} alt="" className="w-5 h-5" />
+                              <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#f7e9db] border border-[#e2cbb2]">
+                                <img
+                                  src={item.icon}
+                                  alt=""
+                                  className="w-5 h-5 object-contain"
+                                  style={{ display: "block" }}
+                                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.border = '1px solid red'; }}
+                                />
+                              </span>
                               <span className="text-[#3a210c]">{item.title}</span>
                             </button>
                           ))}
