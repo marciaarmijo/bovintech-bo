@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Menu, User, Search, Bell, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -18,7 +19,7 @@ const MainApp = () => {
     {
       id: 'trazabilidad',
       title: 'Trazabilidad',
-      icon: '/lovable-uploads/971a2a52-95fd-42f6-b39c-380f8db46647.png'
+      icon: '/lovable-uploads/icon_trazabilidad.png'
     },
     {
       id: 'sanidad',
@@ -82,7 +83,7 @@ const MainApp = () => {
 
   return (
     <OfflineManager>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-[#ac815d]">
         {/* Header */}
         <header className="bg-white border-b border-gray-200 px-4 py-3">
           <div className="flex items-center justify-between">
@@ -197,15 +198,15 @@ const MainApp = () => {
             {modules.map((module) => (
               <Card 
                 key={module.id} 
-                className="card-shadow border border-[#ac815d] hover:shadow-lg bovin-transition cursor-pointer"
+                className="card-shadow border border-[#ac815d] hover:shadow-lg bovin-transition cursor-pointer bg-white"
                 onClick={() => setCurrentModule(module.id)}
               >
                 <CardContent className="p-8 text-center h-full flex flex-col justify-center">
-                  <div className="w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+                  <div className="w-28 h-28 mx-auto mb-6 flex items-center justify-center">
                     <img 
                       src={module.icon} 
                       alt={module.title} 
-                      className="w-16 h-16 object-contain"
+                      className="w-24 h-24 object-contain"
                     />
                   </div>
                   <h3 className="font-semibold text-[#3a210c] text-lg">{module.title}</h3>
