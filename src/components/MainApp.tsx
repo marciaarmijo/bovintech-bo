@@ -45,16 +45,16 @@ const MainApp = () => {
   const drawerItems = {
     herramientas: [
       { id: 'reportes', title: 'Reportes y analíticas', icon: '/lovable-uploads/b4215cfb-75b3-40f1-a0a9-986cd912f86d.png' },
-      { id: 'alertas', title: 'Alertas inteligentes', icon: Bell },
-      { id: 'offline', title: 'Modo offline', icon: 'offline' },
-      { id: 'iot', title: 'Conectividad IoT', icon: 'bluetooth' }
+      { id: 'alertas', title: 'Alertas inteligentes', icon: '/lovable-uploads/57f3d62b-f346-4e5c-bc8b-9d5b5f90bf5b.png' },
+      { id: 'offline', title: 'Modo offline', icon: '/lovable-uploads/91b5dade-9c5b-48df-940b-e3b85b83ac5c.png' },
+      { id: 'iot', title: 'Conectividad IoT', icon: '/lovable-uploads/4b1b1e10-2d4a-4e3e-a3e6-4b7f4b5b2b3a.png' }
     ],
     recursos: [
-      { id: 'bovintech', title: 'BovinTech', icon: '/lovable-uploads/971a2a52-95fd-42f6-b39c-380f8db46647.png' },
-      { id: 'tutoriales', title: 'Tutoriales y nomenclaturas', icon: 'help' }
+      { id: 'bovintech', title: 'BovinTech', icon: '/lovable-uploads/8e35e0b9-cfcf-484e-b7f5-b0e1b5b5b5b5.png' },
+      { id: 'tutoriales', title: 'Tutoriales y nomenclaturas', icon: '/lovable-uploads/6f1c8c8c-8c8c-8c8c-8c8c-8c8c8c8c8c8c.png' }
     ],
     gestion: [
-      { id: 'trabajadores', title: 'Trabajadores', icon: 'users' }
+      { id: 'trabajadores', title: 'Trabajadores', icon: '/lovable-uploads/2c5c5c5c-5c5c-5c5c-5c5c-5c5c5c5c5c5c.png' }
     ]
   };
 
@@ -147,15 +147,7 @@ const MainApp = () => {
                               }}
                               className="w-full flex items-center space-x-3 px-3 py-2 text-left hover:bg-gray-100 rounded-lg bovin-transition"
                             >
-                              {typeof item.icon === 'string' ? (
-                                item.icon.startsWith('/') ? (
-                                  <img src={item.icon} alt="" className="w-5 h-5" />
-                                ) : (
-                                  <div className="w-5 h-5 bg-[#ac815d] rounded"></div>
-                                )
-                              ) : (
-                                <item.icon className="w-5 h-5 text-[#3a210c]" />
-                              )}
+                              <img src={item.icon} alt="" className="w-5 h-5" />
                               <span className="text-[#3a210c]">{item.title}</span>
                             </button>
                           ))}
@@ -195,7 +187,7 @@ const MainApp = () => {
                               }}
                               className="w-full flex items-center space-x-3 px-3 py-2 text-left hover:bg-gray-100 rounded-lg bovin-transition"
                             >
-                              <div className="w-5 h-5 bg-[#ac815d] rounded"></div>
+                              <img src={item.icon} alt="" className="w-5 h-5" />
                               <span className="text-[#3a210c]">{item.title}</span>
                             </button>
                           ))}
