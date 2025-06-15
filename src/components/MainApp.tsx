@@ -1,0 +1,240 @@
+
+import React, { useState } from 'react';
+import { Menu, User, Search, Bell, Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import TrazabilidadModule from './TrazabilidadModule';
+
+const MainApp = () => {
+  const [currentModule, setCurrentModule] = useState<string>('home');
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  const modules = [
+    {
+      id: 'trazabilidad',
+      title: 'Trazabilidad',
+      icon: '/lovable-uploads/971a2a52-95fd-42f6-b39c-380f8db46647.png',
+      description: 'Gestión de animales'
+    },
+    {
+      id: 'sanidad',
+      title: 'Gestión Sanitaria',
+      icon: '/lovable-uploads/c63c2cd7-0428-4558-b822-b46447863975.png',
+      description: 'Control de salud'
+    },
+    {
+      id: 'peso',
+      title: 'Monitoreo de Peso',
+      icon: '/lovable-uploads/9adfd864-ba52-4ec8-bafc-c4900c5b98d9.png',
+      description: 'Control de peso'
+    },
+    {
+      id: 'finanzas',
+      title: 'Análisis Financiero',
+      icon: '/lovable-uploads/9d9ec8ea-0bc4-43c2-ad0a-76b0525d6cac.png',
+      description: 'Gestión económica'
+    }
+  ];
+
+  const drawerItems = {
+    herramientas: [
+      { id: 'reportes', title: 'Reportes y analíticas', icon: '/lovable-uploads/b4215cfb-75b3-40f1-a0a9-986cd912f86d.png' },
+      { id: 'alertas', title: 'Alertas inteligentes', icon: Bell },
+      { id: 'offline', title: 'Modo offline', icon: 'offline' },
+      { id: 'iot', title: 'Conectividad IoT', icon: 'bluetooth' }
+    ],
+    recursos: [
+      { id: 'bovintech', title: 'BovinTech', icon: '/lovable-uploads/971a2a52-95fd-42f6-b39c-380f8db46647.png' },
+      { id: 'tutoriales', title: 'Tutoriales y nomenclaturas', icon: 'help' }
+    ],
+    gestion: [
+      { id: 'trabajadores', title: 'Trabajadores', icon: 'users' }
+    ]
+  };
+
+  const quickActions = [
+    { title: 'Registrar animal', action: () => setCurrentModule('trazabilidad') },
+    { title: 'Registrar peso', action: () => setCurrentModule('peso') },
+    { title: 'Programar vacuna', action: () => setCurrentModule('sanidad') }
+  ];
+
+  const recentAlerts = [
+    { id: 1, title: 'Vacunación pendiente', subtitle: 'Animal 00993 - Fiebre aftosa', time: '2 horas' },
+    { id: 2, title: 'Peso bajo objetivo', subtitle: 'Lote A - Promedio 15kg menos', time: '1 día' },
+    { id: 3, title: 'Revisión sanitaria', subtitle: '5 animales programados', time: '3 días' }
+  ];
+
+  if (currentModule === 'trazabilidad') {
+    return <TrazabilidadModule onBack={() => setCurrentModule('home')} />;
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-200 px-4 py-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <Sheet open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="text-[#3a210c]">
+                  <Menu className="h-6 w-6" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-80 p-0">
+                <div className="h-full bg-white">
+                  <div className="p-6 bg-[#3a210c] text-white">
+                    <div className="flex items-center space-x-3">
+                      <img 
+                        src="/lovable-uploads/971a2a52-95fd-42f6-b39c-380f8db46647.png" 
+                        alt="BovinTech" 
+                        className="w-8 h-8"
+                      />
+                      <div>
+                        <h2 className="font-semibold">Juan Pérez</h2>
+                        <p className="text-sm opacity-90">Finca El Progreso</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="p-4 space-y-6">
+                    <div>
+                      <h3 className="text-sm font-semibold text-gray-600 mb-3">HERRAMIENTAS</h3>
+                      <div className="space-y-1">
+                        {drawerItems.herramientas.map((item) => (
+                          <button
+                            key={item.id}
+                            className="w-full flex items-center space-x-3 px-3 py-2 text-left hover:bg-gray-100 rounded-lg bovin-transition"
+                          >
+                            {typeof item.icon === 'string' ? (
+                              <div className="w-5 h-5 bg-[#ac815d] rounded"></div>
+                            ) : (
+                              <item.icon className="w-5 h-5 text-[#3a210c]" />
+                            )}
+                            <span className="text-[#3a210c]">{item.title}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="text-sm font-semibold text-gray-600 mb-3">RECURSOS</h3>
+                      <div className="space-y-1">
+                        {drawerItems.recursos.map((item) => (
+                          <button
+                            key={item.id}
+                            className="w-full flex items-center space-x-3 px-3 py-2 text-left hover:bg-gray-100 rounded-lg bovin-transition"
+                          >
+                            <img src={item.icon} alt="" className="w-5 h-5" />
+                            <span className="text-[#3a210c]">{item.title}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="text-sm font-semibold text-gray-600 mb-3">GESTIÓN</h3>
+                      <div className="space-y-1">
+                        {drawerItems.gestion.map((item) => (
+                          <button
+                            key={item.id}
+                            className="w-full flex items-center space-x-3 px-3 py-2 text-left hover:bg-gray-100 rounded-lg bovin-transition"
+                          >
+                            <div className="w-5 h-5 bg-[#ac815d] rounded"></div>
+                            <span className="text-[#3a210c]">{item.title}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="absolute bottom-0 left-0 right-0 p-4 border-t">
+                    <button className="w-full flex items-center space-x-3 px-3 py-2 text-left hover:bg-gray-100 rounded-lg bovin-transition">
+                      <User className="w-5 h-5 text-[#3a210c]" />
+                      <span className="text-[#3a210c]">Perfil y ajustes</span>
+                    </button>
+                    <button className="w-full flex items-center space-x-3 px-3 py-2 text-left hover:bg-gray-100 rounded-lg bovin-transition text-red-600">
+                      <div className="w-5 h-5"></div>
+                      <span>Cerrar sesión</span>
+                    </button>
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
+            <h1 className="text-xl font-semibold text-[#3a210c]">Inicio</h1>
+          </div>
+          <Button variant="ghost" size="icon" className="text-[#3a210c]">
+            <User className="h-6 w-6" />
+          </Button>
+        </div>
+      </header>
+
+      <div className="p-4 space-y-6">
+        {/* Main Modules Grid */}
+        <div className="grid grid-cols-2 gap-4">
+          {modules.map((module) => (
+            <Card 
+              key={module.id} 
+              className="card-shadow border-0 hover:shadow-lg bovin-transition cursor-pointer"
+              onClick={() => setCurrentModule(module.id)}
+            >
+              <CardContent className="p-6 text-center">
+                <div className="w-12 h-12 mx-auto mb-3 flex items-center justify-center">
+                  <img 
+                    src={module.icon} 
+                    alt={module.title} 
+                    className="w-8 h-8 object-contain"
+                  />
+                </div>
+                <h3 className="font-semibold text-[#3a210c] mb-1">{module.title}</h3>
+                <p className="text-sm text-[#ac815d]">{module.description}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Alertas Recientes */}
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-[#3a210c]">Alertas Recientes</h2>
+            <button className="text-sm text-[#ac815d] hover:underline">Ver todas</button>
+          </div>
+          <div className="space-y-3">
+            {recentAlerts.map((alert) => (
+              <Card key={alert.id} className="border-l-4 border-l-[#ac815d]">
+                <CardContent className="p-4">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h4 className="font-medium text-[#3a210c] mb-1">{alert.title}</h4>
+                      <p className="text-sm text-gray-600">{alert.subtitle}</p>
+                    </div>
+                    <span className="text-xs text-gray-500">{alert.time}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Accesos Rápidos */}
+        <div>
+          <h2 className="text-lg font-semibold text-[#3a210c] mb-4">Accesos Rápidos</h2>
+          <div className="flex flex-wrap gap-2">
+            {quickActions.map((action, index) => (
+              <Button
+                key={index}
+                variant="outline"
+                onClick={action.action}
+                className="rounded-full border-[#ac815d] text-[#3a210c] hover:bg-[#f0cbad] bovin-transition"
+              >
+                {action.title}
+              </Button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default MainApp;
