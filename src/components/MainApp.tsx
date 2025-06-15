@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { Menu, User, Search, Bell, Plus } from 'lucide-react';
+import { Menu, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -42,19 +43,48 @@ const MainApp = () => {
     }
   ];
 
+  // ACTUALIZACIÓN ICONOS MENU LATERAL
   const drawerItems = {
     herramientas: [
-      { id: 'reportes', title: 'Reportes y analíticas', icon: '/lovable-uploads/b4215cfb-75b3-40f1-a0a9-986cd912f86d.png' },
-      { id: 'alertas', title: 'Alertas inteligentes', icon: '/lovable-uploads/57f3d62b-f346-4e5c-bc8b-9d5b5f90bf5b.png' },
-      { id: 'offline', title: 'Modo offline', icon: '/lovable-uploads/91b5dade-9c5b-48df-940b-e3b85b83ac5c.png' },
-      { id: 'iot', title: 'Conectividad IoT', icon: '/lovable-uploads/4b1b1e10-2d4a-4e3e-a3e6-4b7f4b5b2b3a.png' }
+      {
+        id: 'reportes',
+        title: 'Reportes y analíticas',
+        icon: '/lovable-uploads/a455bfbf-4bb4-4d15-ab30-80017d251c30.png'
+      },
+      {
+        id: 'alertas',
+        title: 'Alertas inteligentes',
+        icon: '/lovable-uploads/abde117b-b76c-4b9a-95c0-d042cf03cccd.png'
+      },
+      {
+        id: 'offline',
+        title: 'Modo offline',
+        icon: '/lovable-uploads/c4c1ea55-7f3e-49cd-b688-c39579e9c914.png'
+      },
+      {
+        id: 'iot',
+        title: 'Conectividad IoT',
+        icon: '/lovable-uploads/5f4141ff-1ec2-43ee-9084-a8a9c7857de5.png'
+      }
     ],
     recursos: [
-      { id: 'bovintech', title: 'BovinTech', icon: '/lovable-uploads/8e35e0b9-cfcf-484e-b7f5-b0e1b5b5b5b5.png' },
-      { id: 'tutoriales', title: 'Tutoriales y nomenclaturas', icon: '/lovable-uploads/6f1c8c8c-8c8c-8c8c-8c8c-8c8c8c8c8c8c.png' }
+      {
+        id: 'bovintech',
+        title: 'BovinTech',
+        icon: '/lovable-uploads/f9a02616-c564-49d5-8c76-6f63d1fd2d97.png'
+      },
+      {
+        id: 'tutoriales',
+        title: 'Tutoriales y nomenclaturas',
+        icon: '/lovable-uploads/83a18128-1654-4e51-ad79-8860d18d3647.png'
+      }
     ],
     gestion: [
-      { id: 'trabajadores', title: 'Trabajadores', icon: '/lovable-uploads/2c5c5c5c-5c5c-5c5c-5c5c-5c5c5c5c5c5c.png' }
+      {
+        id: 'trabajadores',
+        title: 'Trabajadores',
+        icon: '/lovable-uploads/bca22938-9c67-4898-ab34-55d85ff2873f.png'
+      }
     ]
   };
 
@@ -122,10 +152,11 @@ const MainApp = () => {
                   <div className="h-full bg-white">
                     <div className="p-6 bg-[#3a210c] text-white">
                       <div className="flex items-center space-x-3">
+                        {/* Icono de perfil actualizado */}
                         <img 
-                          src="/lovable-uploads/971a2a52-95fd-42f6-b39c-380f8db46647.png" 
-                          alt="BovinTech" 
-                          className="w-8 h-8"
+                          src="/lovable-uploads/bca22938-9c67-4898-ab34-55d85ff2873f.png" 
+                          alt="Perfil"
+                          className="w-8 h-8 object-contain bg-white rounded-full"
                         />
                         <div>
                           <h2 className="font-semibold">Juan Pérez</h2>
@@ -221,7 +252,11 @@ const MainApp = () => {
 
                     <div className="absolute bottom-0 left-0 right-0 p-4 border-t">
                       <button className="w-full flex items-center space-x-3 px-3 py-2 text-left hover:bg-gray-100 rounded-lg bovin-transition">
-                        <User className="w-5 h-5 text-[#3a210c]" />
+                        <img 
+                          src="/lovable-uploads/bca22938-9c67-4898-ab34-55d85ff2873f.png"
+                          alt="Perfil"
+                          className="w-5 h-5 object-contain bg-white rounded-full"
+                        />
                         <span className="text-[#3a210c]">Perfil y ajustes</span>
                       </button>
                       <button className="w-full flex items-center space-x-3 px-3 py-2 text-left hover:bg-gray-100 rounded-lg bovin-transition text-red-600">
@@ -235,7 +270,11 @@ const MainApp = () => {
               <h1 className="text-xl font-semibold text-[#3a210c]">Inicio</h1>
             </div>
             <Button variant="ghost" size="icon" className="text-[#3a210c]">
-              <User className="h-6 w-6" />
+              <img 
+                src="/lovable-uploads/bca22938-9c67-4898-ab34-55d85ff2873f.png"
+                alt="Perfil"
+                className="w-6 h-6 object-contain bg-white rounded-full"
+              />
             </Button>
           </div>
         </header>
