@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Menu, User, Search, Bell, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -235,11 +234,11 @@ const MainApp = () => {
                 onClick={() => setCurrentModule(module.id)}
               >
                 <CardContent className="p-6 text-center h-full flex flex-col items-center justify-center">
-                  <div className="w-[25px] h-[25px] mx-auto mb-4 flex items-center justify-center">
+                  <div className="w-24 h-24 mx-auto mb-4 flex items-center justify-center">
                     <img 
                       src={module.icon} 
                       alt={module.title} 
-                      className="w-[25px] h-[25px] object-contain"
+                      className="w-20 h-20 object-contain"
                     />
                   </div>
                   <h3 className="font-semibold text-[#3a210c] text-lg">{module.title}</h3>
