@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Menu, User, Search, Bell, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,6 +10,11 @@ import MonitoreoPesoModule from './MonitoreoPesoModule';
 import AnalisisFinancieroModule from './AnalisisFinancieroModule';
 import OfflineManager from './OfflineManager';
 import OfflineMode from './OfflineMode';
+import InformesScreen from './InformesScreen';
+import AlertasScreen from './AlertasScreen';
+import ConectividadIoTScreen from './ConectividadIoTScreen';
+import TrabajadoresScreen from './TrabajadoresScreen';
+import TutorialesScreen from './TutorialesScreen';
 
 const MainApp = () => {
   const [currentModule, setCurrentModule] = useState<string>('home');
@@ -80,6 +86,26 @@ const MainApp = () => {
     return <OfflineMode onBack={() => setCurrentModule('home')} />;
   }
 
+  if (currentModule === 'reportes') {
+    return <InformesScreen onBack={() => setCurrentModule('home')} />;
+  }
+
+  if (currentModule === 'alertas') {
+    return <AlertasScreen onBack={() => setCurrentModule('home')} />;
+  }
+
+  if (currentModule === 'iot') {
+    return <ConectividadIoTScreen onBack={() => setCurrentModule('home')} />;
+  }
+
+  if (currentModule === 'trabajadores') {
+    return <TrabajadoresScreen onBack={() => setCurrentModule('home')} />;
+  }
+
+  if (currentModule === 'tutoriales') {
+    return <TutorialesScreen onBack={() => setCurrentModule('home')} />;
+  }
+
   return (
     <OfflineManager>
       <div className="min-h-screen bg-[#ac815d]">
@@ -117,9 +143,7 @@ const MainApp = () => {
                             <button
                               key={item.id}
                               onClick={() => {
-                                if (item.id === 'offline') {
-                                  setCurrentModule('offline');
-                                }
+                                setCurrentModule(item.id);
                                 setIsDrawerOpen(false);
                               }}
                               className="w-full flex items-center space-x-3 px-3 py-2 text-left hover:bg-gray-100 rounded-lg bovin-transition"
@@ -145,6 +169,12 @@ const MainApp = () => {
                           {drawerItems.recursos.map((item) => (
                             <button
                               key={item.id}
+                              onClick={() => {
+                                if (item.id === 'tutoriales') {
+                                  setCurrentModule('tutoriales');
+                                }
+                                setIsDrawerOpen(false);
+                              }}
                               className="w-full flex items-center space-x-3 px-3 py-2 text-left hover:bg-gray-100 rounded-lg bovin-transition"
                             >
                               <img src={item.icon} alt="" className="w-5 h-5" />
@@ -160,6 +190,10 @@ const MainApp = () => {
                           {drawerItems.gestion.map((item) => (
                             <button
                               key={item.id}
+                              onClick={() => {
+                                setCurrentModule('trabajadores');
+                                setIsDrawerOpen(false);
+                              }}
                               className="w-full flex items-center space-x-3 px-3 py-2 text-left hover:bg-gray-100 rounded-lg bovin-transition"
                             >
                               <div className="w-5 h-5 bg-[#ac815d] rounded"></div>
