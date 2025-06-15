@@ -192,7 +192,7 @@ const MainApp = () => {
         </header>
 
         <div className="p-4 space-y-8">
-          {/* Main Modules Grid - Now takes full priority */}
+          {/* Main Modules Grid */}
           <div className="grid grid-cols-2 gap-6" style={{ minHeight: '70vh' }}>
             {modules.map((module) => (
               <Card 
@@ -200,12 +200,12 @@ const MainApp = () => {
                 className="card-shadow border border-[#ac815d] hover:shadow-lg bovin-transition cursor-pointer bg-white"
                 onClick={() => setCurrentModule(module.id)}
               >
-                <CardContent className="p-8 text-center h-full flex flex-col items-center justify-center">
-                  <div className="w-32 h-32 mx-auto mb-6 flex items-center justify-center">
+                <CardContent className="p-6 text-center h-full flex flex-col items-center justify-center">
+                  <div className="w-24 h-24 mx-auto mb-4 flex items-center justify-center">
                     <img 
                       src={module.icon} 
                       alt={module.title} 
-                      className="w-28 h-28 object-contain"
+                      className="w-20 h-20 object-contain"
                     />
                   </div>
                   <h3 className="font-semibold text-[#3a210c] text-lg">{module.title}</h3>
@@ -214,7 +214,7 @@ const MainApp = () => {
             ))}
           </div>
 
-          {/* Alertas Strip - Now positioned lower */}
+          {/* Alertas Strip */}
           <div className="bg-[#f0cbad] rounded-lg p-4">
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-lg font-semibold text-[#3a210c]">Alertas</h2>
