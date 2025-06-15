@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { ArrowLeft, Plus, Bluetooth, Calendar, TrendingUp } from 'lucide-react';
+import { ArrowLeft, Plus, TrendingUp, Scale, BarChart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet';
@@ -12,149 +12,161 @@ interface MonitoreoPesoModuleProps {
 }
 
 const MonitoreoPesoModule = ({ onBack }: MonitoreoPesoModuleProps) => {
-  const [showPesoForm, setShowPesoForm] = useState(false);
-  const [bluetoothConnected, setBluetoothConnected] = useState(false);
+  const [showWeightForm, setShowWeightForm] = useState(false);
 
-  const pesosRecientes = [
-    { id: 1, fecha: '2024-06-15', peso: 640, bluetooth: true },
-    { id: 2, fecha: '2024-06-10', peso: 635, bluetooth: false },
-    { id: 3, fecha: '2024-06-05', peso: 630, bluetooth: true },
-    { id: 4, fecha: '2024-06-01', peso: 625, bluetooth: false }
+  const pesoData = [
+    { id: '00993', lote: 'A-2024', pesoActual: 450, pesoAnterior: 445, fecha: '2024-06-15', ganancia: '+5kg' },
+    { id: '00994', lote: 'A-2024', pesoActual: 425, pesoAnterior: 422, fecha: '2024-06-14', ganancia: '+3kg' },
+    { id: '00995', lote: 'B-2024', pesoActual: 380, pesoAnterior: 385, fecha: '2024-06-13', ganancia: '-5kg' },
+    { id: '00996', lote: 'B-2024', pesoActual: 465, pesoAnterior: 458, fecha: '2024-06-12', ganancia: '+7kg' },
+    { id: '00997', lote: 'C-2024', pesoActual: 440, pesoAnterior: 435, fecha: '2024-06-11', ganancia: '+5kg' }
   ];
 
-  const ultimoPeso = pesosRecientes[0];
-  const gananciaMedia = 2.5; // kg/día
-
-  const handleBluetoothSync = () => {
-    setBluetoothConnected(true);
-    // Simular importación de datos
-    setTimeout(() => {
-      alert('3 nuevas lecturas importadas exitosamente');
-    }, 1500);
-  };
+  const promedios = [
+    { lote: 'A-2024', promedio: 437.5, animales: 25, objetivo: 450, progreso: 97 },
+    { lote: 'B-2024', promedio: 422.5, animales: 30, objetivo: 440, progreso: 96 },
+    { lote: 'C-2024', promedio: 440, animales: 22, objetivo: 455, progreso: 97 }
+  ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#F1D2B9]">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 px-4 py-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="icon" onClick={onBack}>
-              <ArrowLeft className="h-6 w-6 text-[#3a210c]" />
-            </Button>
-            <h1 className="text-xl font-semibold text-[#3a210c]">Monitoreo de Peso</h1>
-          </div>
-          <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={handleBluetoothSync}
-            className={bluetoothConnected ? 'text-green-600' : 'text-[#3a210c]'}
-          >
-            <Bluetooth className="h-6 w-6" />
+        <div className="flex items-center space-x-4">
+          <Button variant="ghost" size="icon" onClick={onBack}>
+            <ArrowLeft className="h-6 w-6 text-[#3a210c]" />
           </Button>
+          <h1 className="text-xl font-semibold text-[#3a210c]">Monitoreo de Peso</h1>
         </div>
       </header>
 
       <div className="p-4 space-y-6">
-        {/* Resumen del Animal */}
-        <Card>
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-[#3a210c]">Animal 00993</CardTitle>
-                <p className="text-lg font-semibold text-[#ac815d]">
-                  Último peso: {ultimoPeso.peso} kg
-                </p>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 gap-3">
+          <Card className="card-shadow bg-white">
+            <CardContent className="p-4 text-center">
+              <div className="flex items-center justify-center mb-2">
+                <Scale className="h-6 w-6 text-[#ac815d]" />
               </div>
-              <div className="w-16 h-16 bg-[#f0cbad] rounded-full flex items-center justify-center">
-                <span className="text-[#3a210c] font-bold text-lg">993</span>
+              <div className="text-2xl font-bold text-[#3a210c]">438kg</div>
+              <div className="text-sm text-gray-600">Peso Promedio</div>
+            </CardContent>
+          </Card>
+          <Card className="card-shadow bg-white">
+            <CardContent className="p-4 text-center">
+              <div className="flex items-center justify-center mb-2">
+                <TrendingUp className="h-6 w-6 text-green-500" />
               </div>
-            </div>
-          </CardHeader>
-        </Card>
+              <div className="text-2xl font-bold text-green-600">+4.2kg</div>
+              <div className="text-sm text-gray-600">Ganancia Semanal</div>
+            </CardContent>
+          </Card>
+        </div>
 
-        {/* Evolución */}
-        <Card>
+        {/* Gráfico de Tendencia */}
+        <Card className="border border-[#ac815d] bg-white">
           <CardHeader>
             <CardTitle className="text-[#3a210c] flex items-center">
-              <TrendingUp className="h-5 w-5 mr-2" />
-              Evolución
+              <BarChart className="h-5 w-5 mr-2" />
+              Tendencia de Peso
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-[#3a210c]">Peso actual:</span>
-                <span className="font-semibold text-[#3a210c]">{ultimoPeso.peso} kg</span>
+            <div className="h-32 bg-gray-100 rounded-lg flex items-end justify-between p-4">
+              {/* Gráfico simplificado */}
+              <div className="flex flex-col items-center space-y-2">
+                <div className="w-6 h-16 bg-[#ac815d] rounded-t"></div>
+                <span className="text-xs text-gray-600">Sem 1</span>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-[#3a210c]">Ganancia media:</span>
-                <span className="font-semibold text-green-600">+{gananciaMedia} kg/día</span>
+              <div className="flex flex-col items-center space-y-2">
+                <div className="w-6 h-18 bg-[#ac815d] rounded-t"></div>
+                <span className="text-xs text-gray-600">Sem 2</span>
               </div>
-              
-              {/* Gráfico Simulado */}
-              <div className="h-32 bg-gray-100 rounded-lg flex items-end justify-between p-2 mt-4">
-                {pesosRecientes.reverse().map((peso, index) => (
-                  <div key={peso.id} className="flex flex-col items-center">
-                    <div 
-                      className="bg-[#ac815d] rounded-t-sm w-6"
-                      style={{ height: `${(peso.peso - 600) * 2}px` }}
-                    ></div>
-                    <span className="text-xs text-gray-600 mt-1">
-                      {peso.fecha.split('-')[2]}
-                    </span>
+              <div className="flex flex-col items-center space-y-2">
+                <div className="w-6 h-20 bg-[#ac815d] rounded-t"></div>
+                <span className="text-xs text-gray-600">Sem 3</span>
+              </div>
+              <div className="flex flex-col items-center space-y-2">
+                <div className="w-6 h-24 bg-[#ac815d] rounded-t"></div>
+                <span className="text-xs text-gray-600">Sem 4</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Promedios por Lote */}
+        <div>
+          <h2 className="text-lg font-semibold text-[#3a210c] mb-4">Promedios por Lote</h2>
+          <div className="space-y-3">
+            {promedios.map(lote => (
+              <Card key={lote.lote} className="border border-[#ac815d] bg-white">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-semibold text-[#3a210c]">{lote.lote}</h3>
+                    <span className="text-sm text-gray-500">{lote.animales} animales</span>
                   </div>
-                ))}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">Peso promedio:</span>
+                      <span className="font-semibold text-[#3a210c]">{lote.promedio}kg</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">Objetivo:</span>
+                      <span className="text-sm text-gray-600">{lote.objetivo}kg</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div 
+                        className="bg-[#ac815d] h-2 rounded-full" 
+                        style={{ width: `${lote.progreso}%` }}
+                      ></div>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-xs text-gray-500">{lote.progreso}% del objetivo</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
 
-        {/* Bluetooth Sync */}
-        <Card className="border-l-4 border-l-blue-500">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h4 className="font-medium text-[#3a210c]">Sincronización Bluetooth</h4>
-                <p className="text-sm text-gray-600">
-                  {bluetoothConnected ? 'Conectado - ' : 'Desconectado - '}
-                  Última sync: 10:30 AM
-                </p>
-              </div>
-              <Button 
-                variant="outline"
-                onClick={handleBluetoothSync}
-                className="border-[#ac815d] text-[#ac815d]"
-              >
-                Sincronizar
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Historial Reciente */}
+        {/* Registros Individuales */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-[#3a210c]">Historial</h2>
-            <button className="text-sm text-[#ac815d] hover:underline">Ver todas</button>
+            <h2 className="text-lg font-semibold text-[#3a210c]">Últimos Registros</h2>
+            <button className="text-sm text-[#ac815d] hover:underline">Ver todos</button>
           </div>
           <div className="space-y-3">
-            {pesosRecientes.slice(0, 3).map(peso => (
-              <Card key={peso.id}>
+            {pesoData.map(animal => (
+              <Card key={animal.id} className="bg-white">
                 <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="flex items-center space-x-2">
-                        <span className="font-medium text-[#3a210c]">{peso.peso} kg</span>
-                        {peso.bluetooth && (
-                          <Bluetooth className="h-4 w-4 text-blue-500" />
-                        )}
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <h3 className="font-semibold text-[#3a210c]">ID: {animal.id}</h3>
+                        <span className="px-2 py-1 bg-[#f0cbad] text-[#3a210c] text-xs rounded-full">
+                          {animal.lote}
+                        </span>
                       </div>
-                      <p className="text-sm text-gray-600">{peso.fecha}</p>
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-600">Peso actual:</span>
+                          <span className="font-semibold text-[#3a210c]">{animal.pesoActual}kg</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-600">Anterior:</span>
+                          <span className="text-sm text-gray-600">{animal.pesoAnterior}kg</span>
+                        </div>
+                      </div>
                     </div>
-                    <Button variant="ghost" size="icon">
-                      <Calendar className="h-4 w-4 text-[#ac815d]" />
-                    </Button>
+                    <div className="text-right">
+                      <div className={`font-semibold ${
+                        animal.ganancia.startsWith('+') ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        {animal.ganancia}
+                      </div>
+                      <div className="text-xs text-gray-500">{animal.fecha}</div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -165,7 +177,7 @@ const MonitoreoPesoModule = ({ onBack }: MonitoreoPesoModuleProps) => {
 
       {/* FAB */}
       <div className="fixed bottom-6 right-6">
-        <Sheet open={showPesoForm} onOpenChange={setShowPesoForm}>
+        <Sheet open={showWeightForm} onOpenChange={setShowWeightForm}>
           <SheetTrigger asChild>
             <Button 
               size="lg" 
@@ -174,15 +186,15 @@ const MonitoreoPesoModule = ({ onBack }: MonitoreoPesoModuleProps) => {
               <Plus className="h-6 w-6" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="bottom" className="h-[60vh]">
+          <SheetContent side="bottom" className="h-[70vh]">
             <SheetHeader>
               <SheetTitle className="text-[#3a210c]">Registrar Peso</SheetTitle>
             </SheetHeader>
             
             <div className="p-4 space-y-4">
               <div>
-                <Label className="text-[#3a210c]">Animal</Label>
-                <Input placeholder="Código del animal" className="mt-1" />
+                <Label className="text-[#3a210c]">ID Animal</Label>
+                <Input placeholder="Escanear o escribir ID" className="mt-1" />
               </div>
               
               <div>
@@ -196,15 +208,16 @@ const MonitoreoPesoModule = ({ onBack }: MonitoreoPesoModuleProps) => {
               </div>
 
               <div>
-                <Label className="text-[#3a210c]">Notas</Label>
+                <Label className="text-[#3a210c]">Observaciones</Label>
                 <textarea 
-                  className="w-full mt-1 p-2 border border-gray-300 rounded-md h-16"
-                  placeholder="Observaciones..."
-                />
+                  className="w-full mt-1 p-2 border border-gray-300 rounded-md" 
+                  rows={3}
+                  placeholder="Observaciones adicionales..."
+                ></textarea>
               </div>
 
               <Button className="w-full bg-[#ac815d] hover:bg-[#3a210c] text-white">
-                Registrar Peso
+                Guardar Peso
               </Button>
             </div>
           </SheetContent>

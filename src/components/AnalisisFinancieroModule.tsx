@@ -63,7 +63,7 @@ const AnalisisFinancieroModule = ({ onBack }: AnalisisFinancieroModuleProps) => 
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#F1D2B9]">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 px-4 py-3">
         <div className="flex items-center justify-between">
@@ -83,7 +83,7 @@ const AnalisisFinancieroModule = ({ onBack }: AnalisisFinancieroModuleProps) => 
         {/* KPIs */}
         <div className="grid grid-cols-2 gap-3">
           {kpis.map((kpi, index) => (
-            <Card key={index} className="card-shadow">
+            <Card key={index} className="card-shadow bg-white">
               <CardContent className="p-4">
                 <div className="space-y-2">
                   <p className="text-xs text-gray-600 font-medium">{kpi.label}</p>
@@ -103,7 +103,7 @@ const AnalisisFinancieroModule = ({ onBack }: AnalisisFinancieroModuleProps) => 
         </div>
 
         {/* Precio Sugerido */}
-        <Card className="border-l-4 border-l-[#ac815d]">
+        <Card className="border-l-4 border-l-[#ac815d] bg-white">
           <CardHeader>
             <CardTitle className="text-[#3a210c] flex items-center">
               <DollarSign className="h-5 w-5 mr-2" />
@@ -137,7 +137,7 @@ const AnalisisFinancieroModule = ({ onBack }: AnalisisFinancieroModuleProps) => 
         </Card>
 
         {/* Gráfico Comparativo */}
-        <Card>
+        <Card className="bg-white">
           <CardHeader>
             <CardTitle className="text-[#3a210c] flex items-center">
               <TrendingUp className="h-5 w-5 mr-2" />
@@ -171,7 +171,7 @@ const AnalisisFinancieroModule = ({ onBack }: AnalisisFinancieroModuleProps) => 
           </div>
           <div className="space-y-3">
             {transacciones.map(transaccion => (
-              <Card key={transaccion.id}>
+              <Card key={transaccion.id} className="bg-white">
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
