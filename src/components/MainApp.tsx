@@ -42,47 +42,47 @@ const MainApp = () => {
     }
   ];
 
-  // ACTUALIZACIÓN ICONOS MENU LATERAL
+  // ACTUALIZACIÓN ICONOS MENU LATERAL con imágenes transparentes del usuario
   const drawerItems = {
     herramientas: [
       {
         id: 'reportes',
         title: 'Reportes y analíticas',
-        icon: '/lovable-uploads/a455bfbf-4bb4-4d15-ab30-80017d251c30.png'
+        icon: '/lovable-uploads/f8178e85-cd3b-45d0-a23b-4dddda732411.png'
       },
       {
         id: 'alertas',
         title: 'Alertas inteligentes',
-        icon: '/lovable-uploads/abde117b-b76c-4b9a-95c0-d042cf03cccd.png'
+        icon: '/lovable-uploads/e6148b8f-bed7-49ff-88ee-f4dc9c5437ae.png'
       },
       {
         id: 'offline',
         title: 'Modo offline',
-        icon: '/lovable-uploads/c4c1ea55-7f3e-49cd-b688-c39579e9c914.png'
+        icon: '/lovable-uploads/b5fff0e7-24a6-4d78-8844-341917703dbd.png'
       },
       {
         id: 'iot',
         title: 'Conectividad IoT',
-        icon: '/lovable-uploads/5f4141ff-1ec2-43ee-9084-a8a9c7857de5.png'
+        icon: '/lovable-uploads/c50da2fa-905f-4dc2-9c68-bb2c03f795fb.png'
       }
     ],
     recursos: [
       {
         id: 'bovintech',
         title: 'BovinTech',
-        icon: '/lovable-uploads/f9a02616-c564-49d5-8c76-6f63d1fd2d97.png'
+        icon: '/lovable-uploads/a02b8dad-ecf9-44f7-872b-c33a14109717.png'
       },
       {
         id: 'tutoriales',
         title: 'Tutoriales y nomenclaturas',
-        icon: '/lovable-uploads/83a18128-1654-4e51-ad79-8860d18d3647.png'
+        icon: '/lovable-uploads/89ea3f4a-6bff-4f1a-a273-9d99fcba986f.png'
       }
     ],
     gestion: [
       {
         id: 'trabajadores',
         title: 'Trabajadores',
-        icon: '/lovable-uploads/bca22938-9c67-4898-ab34-55d85ff2873f.png'
+        icon: '/lovable-uploads/64a81f9f-1085-4536-a19a-405eb9ae5bc0.png'
       }
     ]
   };
