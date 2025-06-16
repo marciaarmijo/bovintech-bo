@@ -168,7 +168,7 @@ const TrazabilidadModule = ({ onBack }: TrazabilidadModuleProps) => {
 
   // ----------- UI ----------- //
   return (
-    <div className="min-h-screen bg-[#f8e7d4]">
+    <div className="min-h-screen bg-[#faf4ef]">
       {/* Header sticky */}
       <header className="bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-30">
         <div className="flex items-center justify-between">
@@ -219,13 +219,13 @@ const TrazabilidadModule = ({ onBack }: TrazabilidadModuleProps) => {
             </div>
           </div>
 
-          {/* Sticky Filters */}
-          <div className="sticky top-[110px] z-30 bg-[#f8e7d4]">
+          {/* Static Filters */}
+          <div className="px-4 pt-4">
             <AnimalFilters value={filters} onChange={setFilters} />
           </div>
 
           {/* Listado de animales */}
-          <div className="px-4 pt-2 pb-28">
+          <div className="px-4 pt-4 pb-28">
             <h2 className="mt-2 mb-3 text-lg font-semibold text-[#3a210c]">Animales</h2>
             <div className="flex flex-col gap-4">
               {filteredAnimals.map(animal => (
@@ -255,30 +255,8 @@ const TrazabilidadModule = ({ onBack }: TrazabilidadModuleProps) => {
           </Button>
         </div>
       ) : (
-        // Tab Movimientos: UI/Flow igual a la implementación existente
+        // Tab Movimientos: Remove duplicate header
         <div>
-          <header className="bg-white border-b border-gray-200 px-4 py-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <Button variant="ghost" size="icon" onClick={onBack}>
-                  <ArrowLeft className="h-6 w-6 text-[#3a210c]" />
-                </Button>
-                <h1 className="text-xl font-semibold text-[#3a210c]">Movimientos</h1>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Button variant="ghost" size="icon">
-                  <Import className="h-6 w-6 text-[#3a210c]" />
-                </Button>
-                <Button variant="ghost" size="icon">
-                  <Filter className="h-6 w-6 text-[#3a210c]" />
-                </Button>
-                <Button variant="ghost" size="icon">
-                  <Search className="h-6 w-6 text-[#3a210c]" />
-                </Button>
-              </div>
-            </div>
-          </header>
-
           <div className="p-4 space-y-6">
             {/* Recent Movements */}
             <div>

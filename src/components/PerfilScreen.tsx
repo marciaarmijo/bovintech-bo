@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { ArrowLeft, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,6 +7,7 @@ import FincaInfoCard from "./Perfil/FincaInfoCard";
 import BovinTechCard from "./Perfil/BovinTechCard";
 import QuickAccessCard from "./Perfil/QuickAccessCard";
 import LogoutButton from "./Perfil/LogoutButton";
+import UserAvatar from "@/components/ui/UserAvatar";
 
 import { toast } from "@/hooks/use-toast";
 
@@ -42,7 +42,6 @@ export default function PerfilScreen({ onBack }: PerfilScreenProps) {
   const [fincaErrors, setFincaErrors] = useState<{ [key: string]: string }>({});
   const [showLogout, setShowLogout] = useState(false);
 
-  // quick toggles state
   const [quick, setQuick] = useState({
     offline: true,
     sync: false,
@@ -50,7 +49,6 @@ export default function PerfilScreen({ onBack }: PerfilScreenProps) {
     notifications: true
   });
 
-  // validation
   function validateProfile(p: typeof profile) {
     const e: { [key: string]: string } = {};
     if (!p.email) e.email = "Requerido";
@@ -70,7 +68,6 @@ export default function PerfilScreen({ onBack }: PerfilScreenProps) {
     if (!editing) {
       setEditing(true);
     } else {
-      // Validate both sections
       const pErrors = validateProfile(profile);
       const fErrors = validateFinca(finca);
       setProfileErrors(pErrors);
@@ -93,7 +90,6 @@ export default function PerfilScreen({ onBack }: PerfilScreenProps) {
     }
   }
 
-  // Proceso de logout simulado
   function handleLogout() {
     onBack();
   }
@@ -112,9 +108,7 @@ export default function PerfilScreen({ onBack }: PerfilScreenProps) {
       </div>
       {/* AVATAR */}
       <div className="flex flex-col items-center mt-6 -mb-2">
-        <div className="w-20 h-20 rounded-full bg-[#e7cdb9] flex items-center justify-center ring-2 ring-[#ac815d]">
-          <span className="text-3xl text-[#3a210c] font-semibold">JP</span>
-        </div>
+        <UserAvatar size={80} name={profile.name} />
       </div>
       {/* DATOS PERSONALES */}
       <div className="max-w-xl mx-auto w-full px-4 space-y-4">
