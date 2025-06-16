@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import TabsGS from '@/components/ui/TabsGS';
 import AnimalFilters from './trazabilidad/AnimalFilters';
 import AnimalCard from './trazabilidad/AnimalCard';
-import AnimalProfileSheet from './trazabilidad/AnimalProfileSheet';
+import AnimalProfileScreen from './trazabilidad/AnimalProfileScreen';
 import CrearAnimalSheet from './trazabilidad/CrearAnimalSheet';
 import AnimalImportSheet from './trazabilidad/AnimalImportSheet';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet';
@@ -81,6 +81,7 @@ const TrazabilidadModule = ({ onBack }: TrazabilidadModuleProps) => {
   ]);
   const [showCrear, setShowCrear] = useState(false);
   const [showImport, setShowImport] = useState(false);
+  const [showAnimalProfile, setShowAnimalProfile] = useState(false);
 
   const [selectedAnimal, setSelectedAnimal] = useState<Animal | null>(null);
   const [showMovementForm, setShowMovementForm] = useState(false);
@@ -167,6 +168,18 @@ const TrazabilidadModule = ({ onBack }: TrazabilidadModuleProps) => {
   };
 
   // ----------- UI ----------- //
+  if (showAnimalProfile && selectedAnimal) {
+    return (
+      <AnimalProfileScreen 
+        animal={selectedAnimal} 
+        onBack={() => {
+          setShowAnimalProfile(false);
+          setSelectedAnimal(null);
+        }} 
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#faf4ef]">
       {/* Header sticky */}
@@ -199,7 +212,6 @@ const TrazabilidadModule = ({ onBack }: TrazabilidadModuleProps) => {
       {/* Sheets */}
       <CrearAnimalSheet open={showCrear} onClose={() => setShowCrear(false)} onCreate={handleCrearAnimal} lotes={[...new Set(animals.map(a=>a.lote))]} />
       <AnimalImportSheet open={showImport} onClose={() => setShowImport(false)} onImport={handleImport} />
-      <AnimalProfileSheet open={!!selectedAnimal} animal={selectedAnimal} onClose={()=>setSelectedAnimal(null)} />
 
       {/* Tab content */}
       {tab === "registro" ? (
@@ -232,7 +244,10 @@ const TrazabilidadModule = ({ onBack }: TrazabilidadModuleProps) => {
                 <AnimalCard
                   key={animal.id}
                   animal={animal}
-                  onClick={() => setSelectedAnimal(animal)}
+                  onClick={() => {
+                    setSelectedAnimal(animal);
+                    setShowAnimalProfile(true);
+                  }}
                 />
               ))}
               {filteredAnimals.length === 0 && (
