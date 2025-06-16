@@ -1,10 +1,10 @@
-
 import React, { useState } from 'react';
 import { Menu, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import UserAvatar from '@/components/ui/UserAvatar';
 import TrazabilidadModule from './TrazabilidadModule';
 import GestionSanitariaModule from './GestionSanitariaModule';
 import MonitoreoPesoModule from './MonitoreoPesoModule';
@@ -171,11 +171,7 @@ const MainApp = () => {
                   <div className="flex-1 bg-white overflow-y-auto">
                     <div className="p-6 bg-[#3a210c] text-white">
                       <div className="flex items-center space-x-3">
-                        <img 
-                          src="/lovable-uploads/bca22938-9c67-4898-ab34-55d85ff2873f.png" 
-                          alt="Perfil"
-                          className="w-8 h-8 object-contain bg-white rounded-full"
-                        />
+                        <UserAvatar size={40} name="Juan Pérez" />
                         <div>
                           <h2 className="font-semibold">Juan Pérez</h2>
                           <p className="text-sm opacity-90">Finca El Progreso</p>
@@ -265,11 +261,7 @@ const MainApp = () => {
                           className="w-full flex items-center space-x-3 px-3 py-2 text-left hover:bg-gray-100 rounded-lg bovin-transition"
                           onClick={() => { setCurrentModule('perfil'); setIsDrawerOpen(false); }}
                         >
-                          <img 
-                            src="/lovable-uploads/bca22938-9c67-4898-ab34-55d85ff2873f.png"
-                            alt="Perfil"
-                            className="w-5 h-5 object-contain bg-white rounded-full"
-                          />
+                          <UserAvatar size={20} name="Juan Pérez" />
                           <span className="text-[#3a210c]">Perfil y ajustes</span>
                         </button>
                       </div>
@@ -293,13 +285,7 @@ const MainApp = () => {
               </Sheet>
               <h1 className="text-xl font-semibold text-[#3a210c]">Inicio</h1>
             </div>
-            <Button variant="ghost" size="icon" className="text-[#3a210c]">
-              <img 
-                src="/lovable-uploads/bca22938-9c67-4898-ab34-55d85ff2873f.png"
-                alt="Perfil"
-                className="w-6 h-6 object-contain bg-white rounded-full"
-              />
-            </Button>
+            <UserAvatar size={40} name="Juan Pérez" />
           </div>
         </header>
 

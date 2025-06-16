@@ -8,7 +8,6 @@ import BovinTechCard from "./Perfil/BovinTechCard";
 import QuickAccessCard from "./Perfil/QuickAccessCard";
 import LogoutButton from "./Perfil/LogoutButton";
 import UserAvatar from "@/components/ui/UserAvatar";
-
 import { toast } from "@/hooks/use-toast";
 
 interface PerfilScreenProps {
@@ -106,10 +105,12 @@ export default function PerfilScreen({ onBack }: PerfilScreenProps) {
           <Edit color="#3a210c" size={22} />
         </Button>
       </div>
+      
       {/* AVATAR */}
       <div className="flex flex-col items-center mt-6 -mb-2">
         <UserAvatar size={80} name={profile.name} />
       </div>
+      
       {/* DATOS PERSONALES */}
       <div className="max-w-xl mx-auto w-full px-4 space-y-4">
         <Card className="p-0 border-[#ac815d]">
@@ -122,6 +123,7 @@ export default function PerfilScreen({ onBack }: PerfilScreenProps) {
             />
           </CardContent>
         </Card>
+        
         {/* INFO FINCA */}
         <Card className="p-0 border-[#ac815d]">
           <CardContent className="p-0">
@@ -134,12 +136,14 @@ export default function PerfilScreen({ onBack }: PerfilScreenProps) {
             />
           </CardContent>
         </Card>
+        
         {/* CARD BOVINTECH */}
         <Card className="p-0 border-[#ac815d]">
           <CardContent className="p-0">
             <BovinTechCard />
           </CardContent>
         </Card>
+        
         {/* ACCESOS RÁPIDOS */}
         <Card className="p-0 border-[#ac815d]">
           <CardContent className="p-0">
@@ -147,8 +151,14 @@ export default function PerfilScreen({ onBack }: PerfilScreenProps) {
           </CardContent>
         </Card>
       </div>
+      
+      {/* USER AVATAR AT BOTTOM */}
+      <div className="w-full px-4 pb-4 mt-6 flex justify-center">
+        <UserAvatar size={100} name={profile.name} />
+      </div>
+      
       {/* BOTÓN CERRAR SESIÓN */}
-      <div className="w-full px-4 pb-7 mt-8">
+      <div className="w-full px-4 pb-7">
         <LogoutButton
           showLogout={showLogout}
           setShowLogout={setShowLogout}

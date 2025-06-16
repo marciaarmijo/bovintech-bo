@@ -28,11 +28,11 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
     <div className={`relative ${className}`}>
       {/* Try to load profile photo, fallback to initials */}
       <div 
-        className="rounded-full bg-[#f0cbad] flex items-center justify-center ring-2 ring-[#ac815d] overflow-hidden"
+        className="rounded-full bg-[#f0cbad] flex items-center justify-center ring-2 ring-[#ac815d] overflow-hidden shadow-md"
         style={{ width: size, height: size }}
       >
         <img 
-          src="/lovable-uploads/41814dda-1c48-4ebb-844f-ede5680e1492.png"
+          src="/lovable-uploads/15a38749-b798-438b-b164-baa94b3746b5.png"
           alt="Foto de perfil"
           className="w-full h-full object-cover"
           onError={(e) => {
