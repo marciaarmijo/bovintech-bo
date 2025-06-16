@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ArrowLeft, Camera, MapPin, Calendar, Scale, Heart, DollarSign, Truck, Edit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -35,6 +34,21 @@ interface Props {
   onBack: () => void;
 }
 
+// Array of cow placeholder images from Unsplash
+const cowImages = [
+  'https://images.unsplash.com/photo-1465379944081-7f47de8d74ac?w=400&h=400&fit=crop&crop=face',
+  'https://images.unsplash.com/photo-1493962853295-0fd70327578a?w=400&h=400&fit=crop&crop=face',
+  'https://images.unsplash.com/photo-1466721591366-2d5fba72006d?w=400&h=400&fit=crop&crop=face',
+  'https://images.unsplash.com/photo-1560114928-40f1f1eb26a0?w=400&h=400&fit=crop&crop=face',
+  'https://images.unsplash.com/photo-1516467508483-a7212febe31a?w=400&h=400&fit=crop&crop=face'
+];
+
+// Function to get consistent image for each animal based on ID
+const getCowImageForAnimal = (animalId: string): string => {
+  const hash = animalId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  return cowImages[hash % cowImages.length];
+};
+
 const AnimalProfileScreen: React.FC<Props> = ({ animal, onBack }) => {
   const [activeTab, setActiveTab] = useState('registro');
 
@@ -55,6 +69,8 @@ const AnimalProfileScreen: React.FC<Props> = ({ animal, onBack }) => {
     gastosMedicos: 150,
     alimentacion: 320
   };
+
+  const cowImageUrl = getCowImageForAnimal(animal.id);
 
   const movimientos = [
     { fecha: '2024-06-15', origen: 'Potrero Sur', destino: 'Potrero Norte', motivo: 'Rotación de pastoreo' },
@@ -97,8 +113,21 @@ const AnimalProfileScreen: React.FC<Props> = ({ animal, onBack }) => {
         <Card className="bg-white border border-[#ac815d] mb-4">
           <CardContent className="p-4">
             <div className="flex items-center space-x-4">
-              <div className="w-16 h-16 rounded-full bg-[#f0cbad] border-2 border-[#ac815d] flex items-center justify-center text-[#ac815d] font-bold text-xl">
-                {animal.id.slice(-2)}
+              <div className="w-16 h-16 rounded-full border-2 border-[#ac815d] overflow-hidden bg-gray-100">
+                <img 
+                  src={cowImageUrl}
+                  alt={`Vaca ${animal.id}`}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    // Fallback to initials if image fails to load
+                    e.currentTarget.style.display = 'none';
+                    const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                    if (fallback) fallback.style.display = 'flex';
+                  }}
+                />
+                <div className="w-full h-full bg-[#f0cbad] border-2 border-[#ac815d] rounded-full hidden items-center justify-center text-[#ac815d] font-bold text-xl">
+                  {animal.id.slice(-2)}
+                </div>
               </div>
               <div className="flex-1">
                 <h2 className="text-xl font-bold text-[#3a210c]">ID {animal.id}</h2>
