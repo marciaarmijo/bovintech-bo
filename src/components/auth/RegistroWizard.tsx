@@ -1,12 +1,13 @@
 
 import React, { useState } from 'react';
-import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useToast } from '@/hooks/use-toast';
 import SuccessModal from '@/components/ui/SuccessModal';
 
 interface RegistroWizardProps {
@@ -19,6 +20,7 @@ const RegistroWizard: React.FC<RegistroWizardProps> = ({ onBack, onSuccess }) =>
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const { toast } = useToast();
   
   const [formData, setFormData] = useState({
     email: '',
@@ -35,78 +37,180 @@ const RegistroWizard: React.FC<RegistroWizardProps> = ({ onBack, onSuccess }) =>
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [touchedFields, setTouchedFields] = useState<{ [key: string]: boolean }>({});
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
 
-  const validateStep1 = () => {
-    const newErrors: { [key: string]: string } = {};
-    
-    if (!formData.email) {
-      newErrors.email = 'Campo requerido';
-    } else if (!validateEmail(formData.email)) {
-      newErrors.email = 'Correo electrónico inválido';
-    }
-    
-    if (!formData.password) {
-      newErrors.password = 'Campo requerido';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Mínimo 6 caracteres';
-    }
-    
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'Campo requerido';
-    } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Las contraseñas no coinciden';
-    }
-    
-    if (!formData.nombre) {
-      newErrors.nombre = 'Campo requerido';
-    }
-    
-    if (!formData.apellidos) {
-      newErrors.apellidos = 'Campo requerido';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  const validatePassword = (password: string) => {
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    return { hasUpperCase, hasNumber };
   };
 
-  const validateStep2 = () => {
-    const newErrors: { [key: string]: string } = {};
-    
-    if (!formData.nombreFinca) {
-      newErrors.nombreFinca = 'Campo requerido';
-    }
-    
-    if (!formData.departamento) {
-      newErrors.departamento = 'Campo requerido';
-    }
-    
-    if (!formData.proposito) {
-      newErrors.proposito = 'Campo requerido';
-    }
-    
-    if (!formData.superficie) {
-      newErrors.superficie = 'Campo requerido';
-    }
-    
-    if (!formData.acceptTerms) {
-      newErrors.acceptTerms = 'Debe aceptar los términos y condiciones';
+  const validateField = (field: string, value: string | boolean) => {
+    const newErrors = { ...errors };
+
+    switch (field) {
+      case 'email':
+        if (!value) {
+          newErrors.email = 'El correo es obligatorio.';
+        } else if (!validateEmail(value as string)) {
+          newErrors.email = 'Introduce un correo electrónico válido.';
+        } else {
+          delete newErrors.email;
+        }
+        break;
+      
+      case 'password':
+        if (!value) {
+          newErrors.password = 'La contraseña es obligatoria.';
+        } else if ((value as string).length < 8) {
+          newErrors.password = 'La contraseña debe tener al menos 8 caracteres.';
+        } else {
+          const { hasUpperCase, hasNumber } = validatePassword(value as string);
+          if (!hasUpperCase || !hasNumber) {
+            newErrors.password = 'Incluye al menos una letra mayúscula y un número.';
+          } else {
+            delete newErrors.password;
+          }
+        }
+        break;
+      
+      case 'confirmPassword':
+        if (!value) {
+          newErrors.confirmPassword = 'Confirma tu contraseña.';
+        } else if (value !== formData.password) {
+          newErrors.confirmPassword = 'Las contraseñas no coinciden.';
+        } else {
+          delete newErrors.confirmPassword;
+        }
+        break;
+      
+      case 'nombre':
+        if (!value) {
+          newErrors.nombre = 'Este campo es obligatorio.';
+        } else {
+          delete newErrors.nombre;
+        }
+        break;
+      
+      case 'apellidos':
+        if (!value) {
+          newErrors.apellidos = 'Este campo es obligatorio.';
+        } else {
+          delete newErrors.apellidos;
+        }
+        break;
+      
+      case 'nombreFinca':
+        if (!value) {
+          newErrors.nombreFinca = 'El nombre de la finca es obligatorio.';
+        } else {
+          delete newErrors.nombreFinca;
+        }
+        break;
+      
+      case 'departamento':
+        if (!value) {
+          newErrors.departamento = 'Selecciona un departamento.';
+        } else {
+          delete newErrors.departamento;
+        }
+        break;
+      
+      case 'proposito':
+        if (!value) {
+          newErrors.proposito = 'Selecciona un propósito.';
+        } else {
+          delete newErrors.proposito;
+        }
+        break;
+      
+      case 'superficie':
+        if (!value) {
+          newErrors.superficie = 'La superficie es obligatoria.';
+        } else if (isNaN(Number(value))) {
+          newErrors.superficie = 'Introduce un valor numérico.';
+        } else {
+          delete newErrors.superficie;
+        }
+        break;
+      
+      case 'acceptTerms':
+        if (!value) {
+          newErrors.acceptTerms = 'Debes aceptar los términos y condiciones.';
+        } else {
+          delete newErrors.acceptTerms;
+        }
+        break;
     }
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return !newErrors[field];
   };
 
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
+    
+    // Validate if field has been touched
+    if (touchedFields[field]) {
+      validateField(field, value);
     }
+    
+    // Special case for confirm password - also validate when password changes
+    if (field === 'password' && touchedFields.confirmPassword) {
+      validateField('confirmPassword', formData.confirmPassword);
+    }
+  };
+
+  const handleBlur = (field: string) => {
+    setTouchedFields(prev => ({ ...prev, [field]: true }));
+    validateField(field, formData[field as keyof typeof formData]);
+  };
+
+  const validateStep1 = () => {
+    const fields = ['email', 'password', 'confirmPassword', 'nombre', 'apellidos'];
+    let hasErrors = false;
+    
+    fields.forEach(field => {
+      setTouchedFields(prev => ({ ...prev, [field]: true }));
+      if (!validateField(field, formData[field as keyof typeof formData])) {
+        hasErrors = true;
+      }
+    });
+
+    if (hasErrors) {
+      toast({
+        title: "Corrige los errores para continuar.",
+        variant: "destructive",
+      });
+    }
+
+    return !hasErrors;
+  };
+
+  const validateStep2 = () => {
+    const fields = ['nombreFinca', 'departamento', 'proposito', 'superficie', 'acceptTerms'];
+    let hasErrors = false;
+    
+    fields.forEach(field => {
+      setTouchedFields(prev => ({ ...prev, [field]: true }));
+      if (!validateField(field, formData[field as keyof typeof formData])) {
+        hasErrors = true;
+      }
+    });
+
+    if (hasErrors) {
+      toast({
+        title: "Corrige los errores para continuar.",
+        variant: "destructive",
+      });
+    }
+
+    return !hasErrors;
   };
 
   const handleNext = () => {
@@ -134,12 +238,22 @@ const RegistroWizard: React.FC<RegistroWizardProps> = ({ onBack, onSuccess }) =>
     onSuccess();
   };
 
-  const isStep1Valid = formData.email && formData.password && formData.confirmPassword && 
-                      formData.nombre && formData.apellidos && 
-                      validateEmail(formData.email) && formData.password === formData.confirmPassword;
+  const renderFieldError = (field: string) => {
+    if (!errors[field]) return null;
+    
+    return (
+      <p className="text-[#d9534f] text-xs mt-1 flex items-center gap-1">
+        <AlertTriangle className="h-3 w-3" />
+        {errors[field]}
+      </p>
+    );
+  };
 
-  const isStep2Valid = formData.nombreFinca && formData.departamento && formData.proposito && 
-                       formData.superficie && formData.acceptTerms;
+  const getInputClassName = (field: string) => {
+    return `text-base text-[#3a210c] border-[#ac815d] focus:ring-[#ac815d] ${
+      errors[field] ? 'border-[#d9534f]' : ''
+    }`;
+  };
 
   return (
     <>
@@ -174,13 +288,19 @@ const RegistroWizard: React.FC<RegistroWizardProps> = ({ onBack, onSuccess }) =>
                 <>
                   <div className="space-y-2">
                     <Label className="text-sm text-[#3a210c]">Correo electrónico *</Label>
-                    <Input
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => handleInputChange('email', e.target.value)}
-                      className="text-base text-[#3a210c] border-[#ac815d] focus:ring-[#ac815d]"
-                    />
-                    {errors.email && <p className="text-red-500 text-xs">{errors.email}</p>}
+                    <div className="relative">
+                      <Input
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => handleInputChange('email', e.target.value)}
+                        onBlur={() => handleBlur('email')}
+                        className={getInputClassName('email')}
+                      />
+                      {errors.email && (
+                        <AlertTriangle className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#d9534f]" />
+                      )}
+                    </div>
+                    {renderFieldError('email')}
                   </div>
 
                   <div className="space-y-2">
@@ -190,7 +310,8 @@ const RegistroWizard: React.FC<RegistroWizardProps> = ({ onBack, onSuccess }) =>
                         type={showPassword ? "text" : "password"}
                         value={formData.password}
                         onChange={(e) => handleInputChange('password', e.target.value)}
-                        className="text-base text-[#3a210c] border-[#ac815d] focus:ring-[#ac815d] pr-10"
+                        onBlur={() => handleBlur('password')}
+                        className={`${getInputClassName('password')} pr-10`}
                       />
                       <Button
                         type="button"
@@ -201,8 +322,11 @@ const RegistroWizard: React.FC<RegistroWizardProps> = ({ onBack, onSuccess }) =>
                       >
                         {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                       </Button>
+                      {errors.password && (
+                        <AlertTriangle className="absolute right-10 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#d9534f]" />
+                      )}
                     </div>
-                    {errors.password && <p className="text-red-500 text-xs">{errors.password}</p>}
+                    {renderFieldError('password')}
                   </div>
 
                   <div className="space-y-2">
@@ -212,7 +336,8 @@ const RegistroWizard: React.FC<RegistroWizardProps> = ({ onBack, onSuccess }) =>
                         type={showConfirmPassword ? "text" : "password"}
                         value={formData.confirmPassword}
                         onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                        className="text-base text-[#3a210c] border-[#ac815d] focus:ring-[#ac815d] pr-10"
+                        onBlur={() => handleBlur('confirmPassword')}
+                        className={`${getInputClassName('confirmPassword')} pr-10`}
                       />
                       <Button
                         type="button"
@@ -223,49 +348,70 @@ const RegistroWizard: React.FC<RegistroWizardProps> = ({ onBack, onSuccess }) =>
                       >
                         {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                       </Button>
+                      {errors.confirmPassword && (
+                        <AlertTriangle className="absolute right-10 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#d9534f]" />
+                      )}
                     </div>
-                    {errors.confirmPassword && <p className="text-red-500 text-xs">{errors.confirmPassword}</p>}
+                    {renderFieldError('confirmPassword')}
                   </div>
 
                   <div className="space-y-2">
                     <Label className="text-sm text-[#3a210c]">Nombre completo *</Label>
-                    <Input
-                      type="text"
-                      value={formData.nombre}
-                      onChange={(e) => handleInputChange('nombre', e.target.value)}
-                      className="text-base text-[#3a210c] border-[#ac815d] focus:ring-[#ac815d]"
-                    />
-                    {errors.nombre && <p className="text-red-500 text-xs">{errors.nombre}</p>}
+                    <div className="relative">
+                      <Input
+                        type="text"
+                        value={formData.nombre}
+                        onChange={(e) => handleInputChange('nombre', e.target.value)}
+                        onBlur={() => handleBlur('nombre')}
+                        className={getInputClassName('nombre')}
+                      />
+                      {errors.nombre && (
+                        <AlertTriangle className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#d9534f]" />
+                      )}
+                    </div>
+                    {renderFieldError('nombre')}
                   </div>
 
                   <div className="space-y-2">
                     <Label className="text-sm text-[#3a210c]">Apellidos *</Label>
-                    <Input
-                      type="text"
-                      value={formData.apellidos}
-                      onChange={(e) => handleInputChange('apellidos', e.target.value)}
-                      className="text-base text-[#3a210c] border-[#ac815d] focus:ring-[#ac815d]"
-                    />
-                    {errors.apellidos && <p className="text-red-500 text-xs">{errors.apellidos}</p>}
+                    <div className="relative">
+                      <Input
+                        type="text"
+                        value={formData.apellidos}
+                        onChange={(e) => handleInputChange('apellidos', e.target.value)}
+                        onBlur={() => handleBlur('apellidos')}
+                        className={getInputClassName('apellidos')}
+                      />
+                      {errors.apellidos && (
+                        <AlertTriangle className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#d9534f]" />
+                      )}
+                    </div>
+                    {renderFieldError('apellidos')}
                   </div>
                 </>
               ) : (
                 <>
                   <div className="space-y-2">
                     <Label className="text-sm text-[#3a210c]">Nombre de la finca *</Label>
-                    <Input
-                      type="text"
-                      value={formData.nombreFinca}
-                      onChange={(e) => handleInputChange('nombreFinca', e.target.value)}
-                      className="text-base text-[#3a210c] border-[#ac815d] focus:ring-[#ac815d]"
-                    />
-                    {errors.nombreFinca && <p className="text-red-500 text-xs">{errors.nombreFinca}</p>}
+                    <div className="relative">
+                      <Input
+                        type="text"
+                        value={formData.nombreFinca}
+                        onChange={(e) => handleInputChange('nombreFinca', e.target.value)}
+                        onBlur={() => handleBlur('nombreFinca')}
+                        className={getInputClassName('nombreFinca')}
+                      />
+                      {errors.nombreFinca && (
+                        <AlertTriangle className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#d9534f]" />
+                      )}
+                    </div>
+                    {renderFieldError('nombreFinca')}
                   </div>
 
                   <div className="space-y-2">
                     <Label className="text-sm text-[#3a210c]">Departamento *</Label>
                     <Select onValueChange={(value) => handleInputChange('departamento', value)}>
-                      <SelectTrigger className="border-[#ac815d] text-base">
+                      <SelectTrigger className={`border-[#ac815d] text-base ${errors.departamento ? 'border-[#d9534f]' : ''}`}>
                         <SelectValue placeholder="Selecciona tu departamento" />
                       </SelectTrigger>
                       <SelectContent>
@@ -273,13 +419,13 @@ const RegistroWizard: React.FC<RegistroWizardProps> = ({ onBack, onSuccess }) =>
                         <SelectItem value="Beni">Beni</SelectItem>
                       </SelectContent>
                     </Select>
-                    {errors.departamento && <p className="text-red-500 text-xs">{errors.departamento}</p>}
+                    {renderFieldError('departamento')}
                   </div>
 
                   <div className="space-y-2">
                     <Label className="text-sm text-[#3a210c]">Propósito *</Label>
                     <Select onValueChange={(value) => handleInputChange('proposito', value)}>
-                      <SelectTrigger className="border-[#ac815d] text-base">
+                      <SelectTrigger className={`border-[#ac815d] text-base ${errors.proposito ? 'border-[#d9534f]' : ''}`}>
                         <SelectValue placeholder="Selecciona el propósito" />
                       </SelectTrigger>
                       <SelectContent>
@@ -288,31 +434,39 @@ const RegistroWizard: React.FC<RegistroWizardProps> = ({ onBack, onSuccess }) =>
                         <SelectItem value="Doble propósito">Doble propósito</SelectItem>
                       </SelectContent>
                     </Select>
-                    {errors.proposito && <p className="text-red-500 text-xs">{errors.proposito}</p>}
+                    {renderFieldError('proposito')}
                   </div>
 
                   <div className="space-y-2">
                     <Label className="text-sm text-[#3a210c]">Superficie (ha) *</Label>
-                    <Input
-                      type="number"
-                      value={formData.superficie}
-                      onChange={(e) => handleInputChange('superficie', e.target.value)}
-                      className="text-base text-[#3a210c] border-[#ac815d] focus:ring-[#ac815d]"
-                    />
-                    {errors.superficie && <p className="text-red-500 text-xs">{errors.superficie}</p>}
+                    <div className="relative">
+                      <Input
+                        type="number"
+                        value={formData.superficie}
+                        onChange={(e) => handleInputChange('superficie', e.target.value)}
+                        onBlur={() => handleBlur('superficie')}
+                        className={getInputClassName('superficie')}
+                      />
+                      {errors.superficie && (
+                        <AlertTriangle className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#d9534f]" />
+                      )}
+                    </div>
+                    {renderFieldError('superficie')}
                   </div>
 
-                  <div className="flex items-center space-x-2 pt-2">
-                    <Checkbox
-                      id="terms"
-                      checked={formData.acceptTerms}
-                      onCheckedChange={(checked) => handleInputChange('acceptTerms', checked as boolean)}
-                    />
-                    <Label htmlFor="terms" className="text-sm text-[#3a210c]">
-                      Acepto Términos y condiciones *
-                    </Label>
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2 pt-2">
+                      <Checkbox
+                        id="terms"
+                        checked={formData.acceptTerms}
+                        onCheckedChange={(checked) => handleInputChange('acceptTerms', checked as boolean)}
+                      />
+                      <Label htmlFor="terms" className="text-sm text-[#3a210c]">
+                        Acepto Términos y condiciones *
+                      </Label>
+                    </div>
+                    {renderFieldError('acceptTerms')}
                   </div>
-                  {errors.acceptTerms && <p className="text-red-500 text-xs">{errors.acceptTerms}</p>}
                 </>
               )}
             </CardContent>
@@ -323,7 +477,6 @@ const RegistroWizard: React.FC<RegistroWizardProps> = ({ onBack, onSuccess }) =>
         <div className="p-4">
           <Button
             onClick={currentStep === 1 ? handleNext : handleCreateAccount}
-            disabled={currentStep === 1 ? !isStep1Valid : !isStep2Valid}
             className="w-4/5 mx-auto block bg-[#ac815d] hover:bg-[#9a7354] text-white rounded-lg text-base py-3"
           >
             {currentStep === 1 ? 'Siguiente' : 'Crear cuenta'}
