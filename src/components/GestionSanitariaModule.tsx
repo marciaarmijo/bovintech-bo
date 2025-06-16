@@ -1,8 +1,10 @@
+
 import React, { useState } from 'react';
 import { ArrowLeft, Plus, Calendar, Clock, AlertTriangle, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
@@ -14,6 +16,8 @@ interface GestionSanitariaModuleProps {
 const GestionSanitariaModule = ({ onBack }: GestionSanitariaModuleProps) => {
   const [currentView, setCurrentView] = useState<'lista' | 'mensual' | 'semanal'>('lista');
   const [showTreatmentForm, setShowTreatmentForm] = useState(false);
+  const [selectedDay, setSelectedDay] = useState<string | null>(null);
+  const [showDayModal, setShowDayModal] = useState(false);
 
   const treatments = [
     {
@@ -91,6 +95,42 @@ const GestionSanitariaModule = ({ onBack }: GestionSanitariaModuleProps) => {
     }
   };
 
+  const getDaysInMonth = () => {
+    const year = 2024;
+    const month = 5; // June (0-indexed)
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const startDate = new Date(firstDay);
+    startDate.setDate(startDate.getDate() - firstDay.getDay());
+    
+    const days = [];
+    for (let i = 0; i < 35; i++) {
+      const currentDate = new Date(startDate);
+      currentDate.setDate(startDate.getDate() + i);
+      days.push(currentDate);
+    }
+    return days;
+  };
+
+  const hasEventsOnDay = (date: Date) => {
+    const dateStr = date.toISOString().split('T')[0];
+    return monthlyCalendar.some(cal => cal.date === dateStr);
+  };
+
+  const getEventsForDay = (date: Date) => {
+    const dateStr = date.toISOString().split('T')[0];
+    const dayEvents = monthlyCalendar.find(cal => cal.date === dateStr);
+    return dayEvents ? dayEvents.events : [];
+  };
+
+  const handleDayClick = (date: Date) => {
+    const events = getEventsForDay(date);
+    if (events.length > 0) {
+      setSelectedDay(date.toISOString().split('T')[0]);
+      setShowDayModal(true);
+    }
+  };
+
   const renderListView = () => (
     <div className="space-y-6">
       {/* Quick Stats */}
@@ -153,26 +193,37 @@ const GestionSanitariaModule = ({ onBack }: GestionSanitariaModuleProps) => {
   const renderMonthlyView = () => (
     <div className="space-y-4">
       <div className="bg-white rounded-lg p-4 border border-[#ac815d]">
-        <h3 className="font-semibold text-[#3a210c] mb-4">Junio 2024</h3>
-        <div className="space-y-3">
-          {monthlyCalendar.map((day, index) => (
-            <div key={index} className="border-l-4 border-l-[#ac815d] pl-4">
-              <div className="font-medium text-[#3a210c] mb-1">
-                {new Date(day.date).toLocaleDateString('es-ES', { 
-                  weekday: 'long', 
-                  day: 'numeric' 
-                })}
-              </div>
-              <div className="space-y-1">
-                {day.events.map((event, eventIndex) => (
-                  <div key={eventIndex} className="text-sm text-gray-600 flex items-center">
-                    <Clock className="h-3 w-3 mr-2 text-[#ac815d]" />
-                    {event}
-                  </div>
-                ))}
-              </div>
+        <h3 className="font-semibold text-[#3a210c] mb-4 text-center">Junio 2024</h3>
+        
+        {/* Calendar Grid */}
+        <div className="grid grid-cols-7 gap-1 mb-2">
+          {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map(day => (
+            <div key={day} className="text-center text-sm font-medium text-gray-600 p-2">
+              {day}
             </div>
           ))}
+        </div>
+        
+        <div className="grid grid-cols-7 gap-1">
+          {getDaysInMonth().map((date, index) => {
+            const isCurrentMonth = date.getMonth() === 5; // June
+            const hasEvents = hasEventsOnDay(date);
+            
+            return (
+              <button
+                key={index}
+                onClick={() => handleDayClick(date)}
+                className={`relative aspect-square p-2 text-sm border border-gray-100 hover:bg-gray-50 transition-colors ${
+                  !isCurrentMonth ? 'text-gray-300' : 'text-[#3a210c]'
+                } ${hasEvents ? 'cursor-pointer' : 'cursor-default'}`}
+              >
+                {date.getDate()}
+                {hasEvents && (
+                  <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-[#ac815d] rounded-full"></div>
+                )}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -199,17 +250,23 @@ const GestionSanitariaModule = ({ onBack }: GestionSanitariaModuleProps) => {
   const renderWeeklyView = () => (
     <div className="space-y-4">
       <div className="bg-white rounded-lg p-4 border border-[#ac815d]">
-        <h3 className="font-semibold text-[#3a210c] mb-4">Semana del 17-21 Junio</h3>
-        <div className="space-y-4">
+        <h3 className="font-semibold text-[#3a210c] mb-4 text-center">Semana del 17-21 Junio</h3>
+        
+        {/* Horizontal Week View */}
+        <div className="grid grid-cols-1 gap-4">
           {weeklySchedule.map((day, index) => (
-            <div key={index} className="border-b border-gray-200 last:border-b-0 pb-3 last:pb-0">
+            <div key={index} className="border-l-4 border-l-[#ac815d] pl-4">
               <div className="font-medium text-[#3a210c] mb-2">{day.day}</div>
-              <div className="space-y-1">
+              <div className="space-y-2">
                 {day.tasks.map((task, taskIndex) => (
-                  <div key={taskIndex} className="text-sm text-gray-600 flex items-center">
-                    <div className="w-2 h-2 bg-[#ac815d] rounded-full mr-3"></div>
-                    {task}
-                  </div>
+                  <Card key={taskIndex} className="bg-gray-50 border border-gray-200">
+                    <CardContent className="p-3">
+                      <div className="text-sm text-gray-600 flex items-center">
+                        <Clock className="h-3 w-3 mr-2 text-[#ac815d]" />
+                        {task}
+                      </div>
+                    </CardContent>
+                  </Card>
                 ))}
               </div>
             </div>
@@ -290,6 +347,30 @@ const GestionSanitariaModule = ({ onBack }: GestionSanitariaModuleProps) => {
         {currentView === 'mensual' && renderMonthlyView()}
         {currentView === 'semanal' && renderWeeklyView()}
       </div>
+
+      {/* Day Events Modal */}
+      <Dialog open={showDayModal} onOpenChange={setShowDayModal}>
+        <DialogContent className="w-[90%] max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-[#3a210c]">
+              Eventos del {selectedDay && new Date(selectedDay).toLocaleDateString('es-ES', { 
+                weekday: 'long', 
+                day: 'numeric', 
+                month: 'long' 
+              })}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            {selectedDay && getEventsForDay(new Date(selectedDay)).map((event, index) => (
+              <Card key={index} className="border border-[#ac815d]">
+                <CardContent className="p-3">
+                  <div className="text-sm text-[#3a210c]">{event}</div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* FAB */}
       <div className="fixed bottom-6 right-6">

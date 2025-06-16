@@ -1,8 +1,10 @@
+
 import React, { useState } from 'react';
 import { Menu, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import TrazabilidadModule from './TrazabilidadModule';
 import GestionSanitariaModule from './GestionSanitariaModule';
 import MonitoreoPesoModule from './MonitoreoPesoModule';
@@ -15,10 +17,12 @@ import ConectividadIoTScreen from './ConectividadIoTScreen';
 import TrabajadoresScreen from './TrabajadoresScreen';
 import TutorialesScreen from './TutorialesScreen';
 import PerfilScreen from "./PerfilScreen";
+import BovinTechScreen from './BovinTechScreen';
 
 const MainApp = () => {
   const [currentModule, setCurrentModule] = useState<string>('home');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   const modules = [
     {
@@ -43,7 +47,6 @@ const MainApp = () => {
     }
   ];
 
-  // ACTUALIZACIÓN ICONOS MENU LATERAL con imágenes transparentes del usuario
   const drawerItems = {
     herramientas: [
       {
@@ -94,6 +97,14 @@ const MainApp = () => {
     { id: 3, title: 'Revisión sanitaria', subtitle: '5 animales programados', time: '3 días' }
   ];
 
+  const handleLogout = () => {
+    // Clear user session data
+    localStorage.clear();
+    sessionStorage.clear();
+    // Navigate to splash/login screen
+    window.location.reload();
+  };
+
   // Renderizar módulos específicos
   if (currentModule === 'trazabilidad') {
     return <TrazabilidadModule onBack={() => setCurrentModule('home')} />;
@@ -139,11 +150,14 @@ const MainApp = () => {
     return <PerfilScreen onBack={() => setCurrentModule('home')} />;
   }
 
+  if (currentModule === 'bovintech') {
+    return <BovinTechScreen onBack={() => setCurrentModule('home')} />;
+  }
+
   return (
     <OfflineManager>
       <div className="min-h-screen bg-[#ac815d]">
         {/* Header */}
-        {/* ... keep existing code (header/topbar) the same ... */}
         <header className="bg-white border-b border-gray-200 px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -153,11 +167,10 @@ const MainApp = () => {
                     <Menu className="h-6 w-6" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="left" className="w-80 p-0">
-                  <div className="h-full bg-white">
+                <SheetContent side="left" className="w-80 p-0 flex flex-col h-full">
+                  <div className="flex-1 bg-white overflow-y-auto">
                     <div className="p-6 bg-[#3a210c] text-white">
                       <div className="flex items-center space-x-3">
-                        {/* Icono de perfil actualizado */}
                         <img 
                           src="/lovable-uploads/bca22938-9c67-4898-ab34-55d85ff2873f.png" 
                           alt="Perfil"
@@ -170,7 +183,7 @@ const MainApp = () => {
                       </div>
                     </div>
                     
-                    <div className="p-4 space-y-6">
+                    <div className="p-4 space-y-6 flex-1">
                       <div>
                         <h3 className="text-sm font-semibold text-gray-600 mb-3">HERRAMIENTAS</h3>
                         <div className="space-y-1">
@@ -194,6 +207,7 @@ const MainApp = () => {
                           ))}
                         </div>
                       </div>
+                      
                       <div>
                         <h3 className="text-sm font-semibold text-gray-600 mb-3">RECURSOS</h3>
                         <div className="space-y-1">
@@ -203,6 +217,8 @@ const MainApp = () => {
                               onClick={() => {
                                 if (item.id === 'tutoriales') {
                                   setCurrentModule('tutoriales');
+                                } else if (item.id === 'bovintech') {
+                                  setCurrentModule('bovintech');
                                 }
                                 setIsDrawerOpen(false);
                               }}
@@ -219,6 +235,7 @@ const MainApp = () => {
                           ))}
                         </div>
                       </div>
+                      
                       <div>
                         <h3 className="text-sm font-semibold text-gray-600 mb-3">GESTIÓN</h3>
                         <div className="space-y-1">
@@ -242,25 +259,35 @@ const MainApp = () => {
                           ))}
                         </div>
                       </div>
+                      
+                      <div className="pt-4">
+                        <button
+                          className="w-full flex items-center space-x-3 px-3 py-2 text-left hover:bg-gray-100 rounded-lg bovin-transition"
+                          onClick={() => { setCurrentModule('perfil'); setIsDrawerOpen(false); }}
+                        >
+                          <img 
+                            src="/lovable-uploads/bca22938-9c67-4898-ab34-55d85ff2873f.png"
+                            alt="Perfil"
+                            className="w-5 h-5 object-contain bg-white rounded-full"
+                          />
+                          <span className="text-[#3a210c]">Perfil y ajustes</span>
+                        </button>
+                      </div>
                     </div>
-
-                    <div className="absolute bottom-0 left-0 right-0 p-4 border-t">
-                      <button
-                        className="w-full flex items-center space-x-3 px-3 py-2 text-left hover:bg-gray-100 rounded-lg bovin-transition"
-                        onClick={() => { setCurrentModule('perfil'); setIsDrawerOpen(false); }}
-                      >
-                        <img 
-                          src="/lovable-uploads/bca22938-9c67-4898-ab34-55d85ff2873f.png"
-                          alt="Perfil"
-                          className="w-5 h-5 object-contain bg-white rounded-full"
-                        />
-                        <span className="text-[#3a210c]">Perfil y ajustes</span>
-                      </button>
-                      <button className="w-full flex items-center space-x-3 px-3 py-2 text-left hover:bg-gray-100 rounded-lg bovin-transition text-red-600">
-                        <div className="w-5 h-5"></div>
-                        <span>Cerrar sesión</span>
-                      </button>
-                    </div>
+                  </div>
+                  
+                  {/* Logout button at bottom */}
+                  <div className="p-4 border-t bg-white">
+                    <button 
+                      onClick={() => {
+                        setIsDrawerOpen(false);
+                        setShowLogoutDialog(true);
+                      }}
+                      className="w-full flex items-center space-x-3 px-3 py-2 text-left hover:bg-gray-100 rounded-lg bovin-transition text-[#d9534f]"
+                    >
+                      <div className="w-5 h-5"></div>
+                      <span>Cerrar sesión</span>
+                    </button>
                   </div>
                 </SheetContent>
               </Sheet>
@@ -318,6 +345,28 @@ const MainApp = () => {
             </div>
           </div>
         </div>
+
+        {/* Logout Confirmation Dialog */}
+        <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+          <AlertDialogContent className="w-[90%] max-w-md">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-[#3a210c]">
+                ¿Estás seguro que deseas cerrar sesión?
+              </AlertDialogTitle>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="flex flex-row gap-2 justify-end">
+              <AlertDialogCancel className="bg-gray-100 text-gray-700 hover:bg-gray-200">
+                Cancelar
+              </AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={handleLogout}
+                className="bg-[#d9534f] text-white hover:bg-[#c9302c]"
+              >
+                Cerrar sesión
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </OfflineManager>
   );
