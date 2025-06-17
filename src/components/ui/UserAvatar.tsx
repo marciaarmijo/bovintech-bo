@@ -5,12 +5,14 @@ interface UserAvatarProps {
   size?: number;
   className?: string;
   name?: string;
+  showBorder?: boolean;
 }
 
 const UserAvatar: React.FC<UserAvatarProps> = ({ 
   size = 80, 
   className = "",
-  name = "Juan Pérez"
+  name = "Juan Pérez",
+  showBorder = false
 }) => {
   // Generate initials from name
   const getInitials = (fullName: string) => {
@@ -28,7 +30,9 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
     <div className={`relative ${className}`}>
       {/* Try to load profile photo, fallback to initials */}
       <div 
-        className="rounded-full bg-[#f0cbad] flex items-center justify-center ring-2 ring-[#ac815d] overflow-hidden shadow-md"
+        className={`rounded-full bg-[#f0cbad] flex items-center justify-center overflow-hidden ${
+          showBorder ? 'ring-2 ring-[#ac815d] shadow-md' : ''
+        }`}
         style={{ width: size, height: size }}
       >
         <img 

@@ -1,11 +1,11 @@
-
 import React, { useState } from 'react';
-import { ArrowLeft, Download, FileText, BarChart3 } from 'lucide-react';
+import { ArrowLeft, Download, FileText, BarChart3, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 
 interface InformesScreenProps {
@@ -21,13 +21,15 @@ const InformesScreen = ({ onBack }: InformesScreenProps) => {
   const [loteId, setLoteId] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [selectedReport, setSelectedReport] = useState<any>(null);
 
   const recentReports = [
-    { id: 1, type: 'Trazabilidad', date: '2024-01-15', title: 'Informe de movimientos' },
-    { id: 2, type: 'Sanidad', date: '2024-01-14', title: 'Estado sanitario general' },
-    { id: 3, type: 'Peso', date: '2024-01-13', title: 'Análisis de peso promedio' },
-    { id: 4, type: 'Finanzas', date: '2024-01-12', title: 'Rentabilidad mensual' },
-    { id: 5, type: 'Trazabilidad', date: '2024-01-11', title: 'Historial de lote A' }
+    { id: 1, type: 'Trazabilidad', date: '2024-01-15', title: 'Informe de movimientos', preview: '/lovable-uploads/9d9ec8ea-0bc4-43c2-ad0a-76b0525d6cac.png' },
+    { id: 2, type: 'Sanidad', date: '2024-01-14', title: 'Estado sanitario general', preview: '/lovable-uploads/b4215cfb-75b3-40f1-a0a9-986cd912f86d.png' },
+    { id: 3, type: 'Peso', date: '2024-01-13', title: 'Análisis de peso promedio', preview: '/lovable-uploads/c50da2fa-905f-4dc2-9c68-bb2c03f795fb.png' },
+    { id: 4, type: 'Finanzas', date: '2024-01-12', title: 'Rentabilidad mensual', preview: '/lovable-uploads/f8178e85-cd3b-45d0-a23b-4dddda732411.png' },
+    { id: 5, type: 'Trazabilidad', date: '2024-01-11', title: 'Historial de lote A', preview: '/lovable-uploads/9adfd864-ba52-4ec8-bafc-c4900c5b98d9.png' }
   ];
 
   const moduleOptions = [
@@ -79,6 +81,25 @@ const InformesScreen = ({ onBack }: InformesScreenProps) => {
     });
   };
 
+  const handleViewReport = (report: any) => {
+    setSelectedReport(report);
+    setShowReportModal(true);
+  };
+
+  const handleDownloadPDF = () => {
+    toast({
+      title: "Descargando PDF",
+      description: "El archivo PDF se está descargando...",
+    });
+  };
+
+  const handleDownloadExcel = () => {
+    toast({
+      title: "Descargando Excel",
+      description: "El archivo Excel se está descargando...",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -104,13 +125,25 @@ const InformesScreen = ({ onBack }: InformesScreenProps) => {
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <FileText className="h-5 w-5 text-[#ac815d]" />
+                      <div className="w-12 h-12 border border-gray-200 rounded overflow-hidden">
+                        <img 
+                          src={report.preview} 
+                          alt="Vista previa" 
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
                       <div>
                         <h3 className="font-medium text-[#3a210c]">{report.title}</h3>
                         <p className="text-sm text-gray-600">{report.type} • {report.date}</p>
                       </div>
                     </div>
-                    <Button variant="outline" size="sm" className="border-[#ac815d] text-[#ac815d]">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="border-[#ac815d] text-[#ac815d]"
+                      onClick={() => handleViewReport(report)}
+                    >
+                      <Eye className="h-4 w-4 mr-1" />
                       Ver
                     </Button>
                   </div>
@@ -120,12 +153,13 @@ const InformesScreen = ({ onBack }: InformesScreenProps) => {
           </div>
         </div>
 
-        {/* Crear informe */}
+        {/* Crear informe - keep existing code for form */}
         <Card className="border border-[#ac815d]">
           <CardHeader>
             <CardTitle className="text-[#3a210c]">Crear informe</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* Keep existing form fields */}
             <div>
               <Label htmlFor="module">Módulo</Label>
               <Select value={selectedModule} onValueChange={setSelectedModule}>
@@ -236,28 +270,41 @@ const InformesScreen = ({ onBack }: InformesScreenProps) => {
           </CardContent>
         </Card>
 
-        {/* Resultados (simulado) */}
+        {/* Resultados con preview y botones de descarga */}
         {selectedModule && parameter1 && (
           <Card className="border border-[#ac815d]">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-[#3a210c]">Resultados</CardTitle>
                 <div className="flex space-x-2">
-                  <Button variant="outline" size="sm" className="border-[#ac815d] text-[#ac815d]">
-                    <Download className="h-4 w-4 mr-2" />
-                    PDF
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="border-[#ac815d] text-[#ac815d]"
+                    onClick={handleDownloadPDF}
+                  >
+                    📥 Descargar PDF
                   </Button>
-                  <Button variant="outline" size="sm" className="border-[#ac815d] text-[#ac815d]">
-                    <BarChart3 className="h-4 w-4 mr-2" />
-                    Excel
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="border-[#ac815d] text-[#ac815d]"
+                    onClick={handleDownloadExcel}
+                  >
+                    📊 Descargar Excel
                   </Button>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
-              <div className="bg-gray-100 h-48 rounded-lg flex items-center justify-center mb-4">
-                <p className="text-gray-500">Gráfico del informe</p>
+              <div className="bg-gray-100 h-48 rounded-lg flex items-center justify-center mb-4 overflow-hidden">
+                <img 
+                  src="/lovable-uploads/c50da2fa-905f-4dc2-9c68-bb2c03f795fb.png" 
+                  alt="Vista previa del informe" 
+                  className="w-full h-full object-cover"
+                />
               </div>
+              {/* Keep existing table */}
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
@@ -288,6 +335,42 @@ const InformesScreen = ({ onBack }: InformesScreenProps) => {
           </Card>
         )}
       </div>
+
+      {/* Modal para ver informe completo */}
+      <Dialog open={showReportModal} onOpenChange={setShowReportModal}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-[#3a210c]">
+              {selectedReport?.title}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="w-full h-96 border border-gray-200 rounded overflow-hidden">
+              <img 
+                src={selectedReport?.preview} 
+                alt="Informe completo" 
+                className="w-full h-full object-contain"
+              />
+            </div>
+            <div className="flex justify-center space-x-4">
+              <Button 
+                variant="outline" 
+                className="border-[#ac815d] text-[#ac815d]"
+                onClick={handleDownloadPDF}
+              >
+                📥 Descargar PDF
+              </Button>
+              <Button 
+                variant="outline" 
+                className="border-[#ac815d] text-[#ac815d]"
+                onClick={handleDownloadExcel}
+              >
+                📊 Descargar Excel
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

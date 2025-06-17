@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { ArrowLeft, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -108,7 +109,7 @@ export default function PerfilScreen({ onBack }: PerfilScreenProps) {
       
       {/* AVATAR */}
       <div className="flex flex-col items-center mt-6 -mb-2">
-        <UserAvatar size={80} name={profile.name} />
+        <UserAvatar size={80} name={profile.name} showBorder />
       </div>
       
       {/* DATOS PERSONALES */}
@@ -152,9 +153,9 @@ export default function PerfilScreen({ onBack }: PerfilScreenProps) {
         </Card>
       </div>
       
-      {/* USER AVATAR AT BOTTOM */}
+      {/* USER AVATAR AT BOTTOM - with border and shadow */}
       <div className="w-full px-4 pb-4 mt-6 flex justify-center">
-        <UserAvatar size={100} name={profile.name} />
+        <UserAvatar size={100} name={profile.name} showBorder />
       </div>
       
       {/* BOTÓN CERRAR SESIÓN */}

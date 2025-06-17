@@ -23,11 +23,59 @@ const TrabajadoresScreen = ({ onBack }: TrabajadoresScreenProps) => {
   });
   const { toast } = useToast();
 
+  // Generate random avatar based on gender
+  const getRandomAvatar = (gender: 'male' | 'female') => {
+    const maleAvatars = [
+      'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=150&h=150&fit=crop&crop=face',
+      'https://images.unsplash.com/photo-1518005020951-eccb494ad742?w=150&h=150&fit=crop&crop=face',
+      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face'
+    ];
+    
+    const femaleAvatars = [
+      'https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=150&h=150&fit=crop&crop=face',
+      'https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?w=150&h=150&fit=crop&crop=face',
+      'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
+      'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face'
+    ];
+    
+    const avatars = gender === 'male' ? maleAvatars : femaleAvatars;
+    return avatars[Math.floor(Math.random() * avatars.length)];
+  };
+
   const trabajadores = [
-    { id: 1, nombre: 'Juan Pérez', email: 'juan@finca.com', iniciales: 'JP' },
-    { id: 2, nombre: 'María García', email: 'maria@finca.com', iniciales: 'MG' },
-    { id: 3, nombre: 'Carlos López', email: 'carlos@finca.com', iniciales: 'CL' },
-    { id: 4, nombre: 'Ana Martínez', email: 'ana@finca.com', iniciales: 'AM' }
+    { 
+      id: 1, 
+      nombre: 'Juan Pérez', 
+      email: 'juan@finca.com', 
+      iniciales: 'JP',
+      gender: 'male' as const,
+      avatar: getRandomAvatar('male')
+    },
+    { 
+      id: 2, 
+      nombre: 'María García', 
+      email: 'maria@finca.com', 
+      iniciales: 'MG',
+      gender: 'female' as const,
+      avatar: getRandomAvatar('female')
+    },
+    { 
+      id: 3, 
+      nombre: 'Carlos López', 
+      email: 'carlos@finca.com', 
+      iniciales: 'CL',
+      gender: 'male' as const,
+      avatar: getRandomAvatar('male')
+    },
+    { 
+      id: 4, 
+      nombre: 'Ana Martínez', 
+      email: 'ana@finca.com', 
+      iniciales: 'AM',
+      gender: 'female' as const,
+      avatar: getRandomAvatar('female')
+    }
   ];
 
   const filteredTrabajadores = trabajadores.filter(t => 
@@ -88,8 +136,22 @@ const TrabajadoresScreen = ({ onBack }: TrabajadoresScreenProps) => {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-[#ac815d] rounded-full flex items-center justify-center">
-                    <span className="text-white font-medium">{trabajador.iniciales}</span>
+                  <div className="w-12 h-12 rounded-full overflow-hidden">
+                    <img 
+                      src={trabajador.avatar} 
+                      alt={trabajador.nombre}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        // Fallback to initials if image fails to load
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                        const parent = target.parentElement;
+                        if (parent) {
+                          parent.className = 'w-12 h-12 bg-[#ac815d] rounded-full flex items-center justify-center';
+                          parent.innerHTML = `<span class="text-white font-medium">${trabajador.iniciales}</span>`;
+                        }
+                      }}
+                    />
                   </div>
                   <div>
                     <h4 className="font-medium text-[#3a210c]">{trabajador.nombre}</h4>
