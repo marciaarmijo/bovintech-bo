@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { ArrowLeft, Download, FileText, BarChart3, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -23,6 +24,7 @@ const InformesScreen = ({ onBack }: InformesScreenProps) => {
   const [endDate, setEndDate] = useState('');
   const [showReportModal, setShowReportModal] = useState(false);
   const [selectedReport, setSelectedReport] = useState<any>(null);
+  const [reportGenerated, setReportGenerated] = useState(false);
 
   const recentReports = [
     { id: 1, type: 'Trazabilidad', date: '2024-01-15', title: 'Informe de movimientos', preview: '/lovable-uploads/9d9ec8ea-0bc4-43c2-ad0a-76b0525d6cac.png' },
@@ -75,6 +77,7 @@ const InformesScreen = ({ onBack }: InformesScreenProps) => {
       return;
     }
 
+    setReportGenerated(true);
     toast({
       title: "Informe generado con éxito",
       description: "El informe se ha creado correctamente",
@@ -98,6 +101,20 @@ const InformesScreen = ({ onBack }: InformesScreenProps) => {
       title: "Descargando Excel",
       description: "El archivo Excel se está descargando...",
     });
+  };
+
+  const getReportPreview = () => {
+    // Generate different preview based on selected module
+    switch(selectedModule) {
+      case 'peso':
+        return '/lovable-uploads/c50da2fa-905f-4dc2-9c68-bb2c03f795fb.png';
+      case 'sanidad':
+        return '/lovable-uploads/b4215cfb-75b3-40f1-a0a9-986cd912f86d.png';
+      case 'finanzas':
+        return '/lovable-uploads/f8178e85-cd3b-45d0-a23b-4dddda732411.png';
+      default:
+        return '/lovable-uploads/9d9ec8ea-0bc4-43c2-ad0a-76b0525d6cac.png';
+    }
   };
 
   return (
@@ -153,13 +170,12 @@ const InformesScreen = ({ onBack }: InformesScreenProps) => {
           </div>
         </div>
 
-        {/* Crear informe - keep existing code for form */}
+        {/* Crear informe */}
         <Card className="border border-[#ac815d]">
           <CardHeader>
             <CardTitle className="text-[#3a210c]">Crear informe</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Keep existing form fields */}
             <div>
               <Label htmlFor="module">Módulo</Label>
               <Select value={selectedModule} onValueChange={setSelectedModule}>
@@ -271,65 +287,74 @@ const InformesScreen = ({ onBack }: InformesScreenProps) => {
         </Card>
 
         {/* Resultados con preview y botones de descarga */}
-        {selectedModule && parameter1 && (
+        {reportGenerated && selectedModule && parameter1 && (
           <Card className="border border-[#ac815d]">
             <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-[#3a210c]">Resultados</CardTitle>
-                <div className="flex space-x-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="border-[#ac815d] text-[#ac815d]"
-                    onClick={handleDownloadPDF}
-                  >
-                    📥 Descargar PDF
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="border-[#ac815d] text-[#ac815d]"
-                    onClick={handleDownloadExcel}
-                  >
-                    📊 Descargar Excel
-                  </Button>
-                </div>
-              </div>
+              <CardTitle className="text-[#3a210c]">Resultados</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="bg-gray-100 h-48 rounded-lg flex items-center justify-center mb-4 overflow-hidden">
-                <img 
-                  src="/lovable-uploads/c50da2fa-905f-4dc2-9c68-bb2c03f795fb.png" 
-                  alt="Vista previa del informe" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              {/* Keep existing table */}
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b">
-                      <th className="text-left p-2">ID</th>
-                      <th className="text-left p-2">Descripción</th>
-                      <th className="text-left p-2">Valor</th>
-                      <th className="text-left p-2">Fecha</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr className="border-b hover:bg-gray-50 cursor-pointer">
-                      <td className="p-2">001</td>
-                      <td className="p-2">Animal ejemplo</td>
-                      <td className="p-2">450 kg</td>
-                      <td className="p-2">2024-01-15</td>
-                    </tr>
-                    <tr className="border-b hover:bg-gray-50 cursor-pointer">
-                      <td className="p-2">002</td>
-                      <td className="p-2">Animal ejemplo 2</td>
-                      <td className="p-2">475 kg</td>
-                      <td className="p-2">2024-01-14</td>
-                    </tr>
-                  </tbody>
-                </table>
+              <div className="space-y-4">
+                {/* Preview thumbnail */}
+                <div className="flex items-start space-x-4">
+                  <div className="w-32 h-24 border border-gray-200 rounded overflow-hidden bg-gray-100">
+                    <img 
+                      src={getReportPreview()}
+                      alt="Vista previa del informe" 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-medium text-[#3a210c] mb-2">
+                      Informe de {selectedModule} - {parameter1}
+                    </h3>
+                    <div className="flex space-x-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="border-[#ac815d] text-[#ac815d]"
+                        onClick={handleDownloadPDF}
+                      >
+                        📥 Descargar PDF
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="border-[#ac815d] text-[#ac815d]"
+                        onClick={handleDownloadExcel}
+                      >
+                        📊 Descargar Excel
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Data table */}
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="text-left p-2">ID</th>
+                        <th className="text-left p-2">Descripción</th>
+                        <th className="text-left p-2">Valor</th>
+                        <th className="text-left p-2">Fecha</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="border-b hover:bg-gray-50 cursor-pointer">
+                        <td className="p-2">001</td>
+                        <td className="p-2">Animal ejemplo</td>
+                        <td className="p-2">450 kg</td>
+                        <td className="p-2">2024-01-15</td>
+                      </tr>
+                      <tr className="border-b hover:bg-gray-50 cursor-pointer">
+                        <td className="p-2">002</td>
+                        <td className="p-2">Animal ejemplo 2</td>
+                        <td className="p-2">475 kg</td>
+                        <td className="p-2">2024-01-14</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </CardContent>
           </Card>

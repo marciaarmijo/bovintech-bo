@@ -1,8 +1,9 @@
 
 import React, { useState } from "react";
-import { ArrowLeft, Edit } from "lucide-react";
+import { ArrowLeft, Edit, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import PersonalInfoCard from "./Perfil/PersonalInfoCard";
 import FincaInfoCard from "./Perfil/FincaInfoCard";
 import BovinTechCard from "./Perfil/BovinTechCard";
@@ -34,7 +35,7 @@ const propOptions = [
   "Doble propósito"
 ];
 
-export default function PerfilScreen({ onBack }: PerfilScreenProps) {
+export default function PerfilScreen({ onBack }: PerfilScreenProps) => {
   const [editing, setEditing] = useState(false);
   const [profile, setProfile] = useState(initialProfile);
   const [profileErrors, setProfileErrors] = useState<{ [key: string]: string }>({});
@@ -79,6 +80,14 @@ export default function PerfilScreen({ onBack }: PerfilScreenProps) {
     }
   }
 
+  function handleCancel() {
+    setEditing(false);
+    setProfile(initialProfile);
+    setFinca(initialFinca);
+    setProfileErrors({});
+    setFincaErrors({});
+  }
+
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
     const { name, value } = e.target;
     if (["email", "phone", "name"].includes(name)) {
@@ -102,14 +111,21 @@ export default function PerfilScreen({ onBack }: PerfilScreenProps) {
           <ArrowLeft color="#3a210c" size={22} />
         </Button>
         <h2 className="text-[18px] font-semibold text-[#3a210c] select-none">Perfil</h2>
-        <Button variant="ghost" size="icon" onClick={handleEditSave}>
-          <Edit color="#3a210c" size={22} />
-        </Button>
+        <div className="flex space-x-2">
+          {editing && (
+            <Button variant="ghost" size="icon" onClick={handleCancel}>
+              <X color="#d9534f" size={22} />
+            </Button>
+          )}
+          <Button variant="ghost" size="icon" onClick={handleEditSave}>
+            {editing ? <Check color="#28a745" size={22} /> : <Edit color="#3a210c" size={22} />}
+          </Button>
+        </div>
       </div>
       
       {/* AVATAR */}
       <div className="flex flex-col items-center mt-6 -mb-2">
-        <UserAvatar size={80} name={profile.name} showBorder />
+        <UserAvatar size={80} name={profile.name} />
       </div>
       
       {/* DATOS PERSONALES */}
@@ -153,7 +169,7 @@ export default function PerfilScreen({ onBack }: PerfilScreenProps) {
         </Card>
       </div>
       
-      {/* USER AVATAR AT BOTTOM - with border and shadow */}
+      {/* USER AVATAR AT BOTTOM - with shadow only */}
       <div className="w-full px-4 pb-4 mt-6 flex justify-center">
         <UserAvatar size={100} name={profile.name} showBorder />
       </div>
@@ -166,6 +182,18 @@ export default function PerfilScreen({ onBack }: PerfilScreenProps) {
           onLogout={handleLogout}
         />
       </div>
+
+      {/* Save Changes Button - shown when editing */}
+      {editing && (
+        <div className="fixed bottom-20 left-4 right-4 z-30">
+          <Button 
+            onClick={handleEditSave}
+            className="w-full bg-[#ac815d] hover:bg-[#3a210c] text-white py-3 text-lg font-medium shadow-lg"
+          >
+            Guardar cambios
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

@@ -26,6 +26,15 @@ const BovinTechScreen = ({ onBack }: BovinTechScreenProps) => {
       </header>
 
       <div className="p-4 space-y-6">
+        {/* BovinTech Logo Header */}
+        <div className="flex justify-center mb-6">
+          <img 
+            src="/lovable-uploads/41814dda-1c48-4ebb-844f-ede5680e1492.png" 
+            alt="BovinTech Logo" 
+            className="w-20 h-auto"
+          />
+        </div>
+
         {/* Nuestra misión */}
         <Card className="bg-white border border-[#ac815d] rounded-lg">
           <CardHeader className="pb-3">

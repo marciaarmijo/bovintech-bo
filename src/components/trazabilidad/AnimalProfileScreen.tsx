@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Camera, MapPin, Calendar, Scale, Heart, DollarSign, Truck, Edit } from 'lucide-react';
+import { ArrowLeft, Camera, MapPin, Calendar, Scale, Heart, DollarSign, Truck, Edit, Check, X, MoreVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { useToast } from '@/hooks/use-toast';
 
 interface AnimalData {
   id: string;
@@ -15,7 +20,6 @@ interface AnimalData {
   fechaIngreso?: string;
   pesoInicial?: number;
   sexo?: 'Macho' | 'Hembra';
-  // Additional data that would come from other modules
   raza?: string;
   fechaNacimiento?: string;
   pesoActual?: number;
@@ -51,6 +55,9 @@ const getCowImageForAnimal = (animalId: string): string => {
 
 const AnimalProfileScreen: React.FC<Props> = ({ animal, onBack }) => {
   const [activeTab, setActiveTab] = useState('registro');
+  const [editing, setEditing] = useState(false);
+  const [editedAnimal, setEditedAnimal] = useState(animal);
+  const { toast } = useToast();
 
   if (!animal) return null;
 
@@ -71,6 +78,34 @@ const AnimalProfileScreen: React.FC<Props> = ({ animal, onBack }) => {
   };
 
   const cowImageUrl = getCowImageForAnimal(animal.id);
+
+  const departamentos = ['La Paz', 'Cochabamba', 'Santa Cruz', 'Tarija', 'Oruro', 'Potosí', 'Beni', 'Pando', 'Chuquisaca'];
+  const razas = ['Brahman', 'Nelore', 'Angus', 'Hereford', 'Charolais', 'Limousin'];
+
+  const handleEdit = () => {
+    setEditing(true);
+    setEditedAnimal(extendedAnimal);
+  };
+
+  const handleSave = () => {
+    setEditing(false);
+    toast({
+      title: "Animal actualizado",
+      description: "Los datos del animal se han guardado correctamente",
+    });
+  };
+
+  const handleCancel = () => {
+    setEditing(false);
+    setEditedAnimal(animal);
+  };
+
+  const handleInputChange = (field: string, value: string | number) => {
+    setEditedAnimal(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
 
   const movimientos = [
     { fecha: '2024-06-15', origen: 'Potrero Sur', destino: 'Potrero Norte', motivo: 'Rotación de pastoreo' },
@@ -102,9 +137,24 @@ const AnimalProfileScreen: React.FC<Props> = ({ animal, onBack }) => {
             </Button>
             <h1 className="text-xl font-semibold text-[#3a210c]">Animal {animal.id}</h1>
           </div>
-          <Button variant="ghost" size="icon" className="text-[#ac815d]">
-            <Camera className="h-6 w-6" />
-          </Button>
+          <div className="flex items-center space-x-2">
+            <Button variant="ghost" size="icon" className="text-[#ac815d]">
+              <Camera className="h-6 w-6" />
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="text-[#3a210c]">
+                  <MoreVertical className="h-6 w-6" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={handleEdit}>
+                  <Edit className="h-4 w-4 mr-2" />
+                  Editar
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </header>
 
@@ -131,12 +181,12 @@ const AnimalProfileScreen: React.FC<Props> = ({ animal, onBack }) => {
               </div>
               <div className="flex-1">
                 <h2 className="text-xl font-bold text-[#3a210c]">ID {animal.id}</h2>
-                <p className="text-[#ac815d] font-medium">{animal.lote}</p>
-                <p className="text-sm text-gray-600">{extendedAnimal.raza} • {animal.sexo}</p>
+                <p className="text-[#ac815d] font-medium">{editing ? editedAnimal.lote : animal.lote}</p>
+                <p className="text-sm text-gray-600">{editing ? editedAnimal.raza : extendedAnimal.raza} • {animal.sexo}</p>
               </div>
               <div className="text-right">
-                <p className="text-lg font-bold text-[#3a210c]">{animal.peso}</p>
-                <p className="text-sm text-gray-600">{animal.ubicacion}</p>
+                <p className="text-lg font-bold text-[#3a210c]">{editing ? `${editedAnimal.pesoActual} kg` : animal.peso}</p>
+                <p className="text-sm text-gray-600">{editing ? editedAnimal.ubicacion : animal.ubicacion}</p>
               </div>
             </div>
           </CardContent>
@@ -161,32 +211,143 @@ const AnimalProfileScreen: React.FC<Props> = ({ animal, onBack }) => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium text-gray-600">Departamento</label>
-                    <p className="text-[#3a210c]">{animal.departamento}</p>
+                {editing ? (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-[#3a210c]">Departamento</Label>
+                      <Select 
+                        value={editedAnimal.departamento || ''} 
+                        onValueChange={(value) => handleInputChange('departamento', value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccionar" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {departamentos.map(dep => (
+                            <SelectItem key={dep} value={dep}>{dep}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className="text-[#3a210c]">Proveedor</Label>
+                      <Input 
+                        value={editedAnimal.proveedor || ''}
+                        onChange={(e) => handleInputChange('proveedor', e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-[#3a210c]">Fecha Ingreso</Label>
+                      <Input 
+                        type="date"
+                        value={editedAnimal.fechaIngreso || ''}
+                        onChange={(e) => handleInputChange('fechaIngreso', e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-[#3a210c]">Fecha Nacimiento</Label>
+                      <Input 
+                        type="date"
+                        value={editedAnimal.fechaNacimiento || ''}
+                        onChange={(e) => handleInputChange('fechaNacimiento', e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-[#3a210c]">Peso Inicial (kg)</Label>
+                      <Input 
+                        type="number"
+                        value={editedAnimal.pesoInicial || ''}
+                        onChange={(e) => handleInputChange('pesoInicial', Number(e.target.value))}
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-[#3a210c]">Raza</Label>
+                      <Select 
+                        value={editedAnimal.raza || ''} 
+                        onValueChange={(value) => handleInputChange('raza', value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccionar" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {razas.map(raza => (
+                            <SelectItem key={raza} value={raza}>{raza}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600">Proveedor</label>
-                    <p className="text-[#3a210c]">{animal.proveedor}</p>
+                ) : (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Departamento</label>
+                      <p className="text-[#3a210c]">{animal.departamento}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Proveedor</label>
+                      <p className="text-[#3a210c]">{animal.proveedor}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Fecha Ingreso</label>
+                      <p className="text-[#3a210c]">{animal.fechaIngreso}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Fecha Nacimiento</label>
+                      <p className="text-[#3a210c]">{extendedAnimal.fechaNacimiento}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Peso Inicial</label>
+                      <p className="text-[#3a210c]">{animal.pesoInicial} kg</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Raza</label>
+                      <p className="text-[#3a210c]">{extendedAnimal.raza}</p>
+                    </div>
                   </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600">Fecha Ingreso</label>
-                    <p className="text-[#3a210c]">{animal.fechaIngreso}</p>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Datos de Compra Card */}
+            <Card className="bg-white">
+              <CardHeader>
+                <CardTitle className="text-[#3a210c] flex items-center">
+                  <DollarSign className="h-5 w-5 mr-2" />
+                  Datos de Compra
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {editing ? (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-[#3a210c]">Costo Compra (Bs.)</Label>
+                      <Input 
+                        type="number"
+                        value={editedAnimal.costoCompra || ''}
+                        onChange={(e) => handleInputChange('costoCompra', Number(e.target.value))}
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-[#3a210c]">Valor Actual (Bs.)</Label>
+                      <Input 
+                        type="number"
+                        value={editedAnimal.valorActual || ''}
+                        onChange={(e) => handleInputChange('valorActual', Number(e.target.value))}
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600">Fecha Nacimiento</label>
-                    <p className="text-[#3a210c]">{extendedAnimal.fechaNacimiento}</p>
+                ) : (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Costo de Compra</label>
+                      <p className="text-[#3a210c]">Bs. {extendedAnimal.costoCompra}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Valor Actual</label>
+                      <p className="text-[#3a210c]">Bs. {extendedAnimal.valorActual}</p>
+                    </div>
                   </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600">Peso Inicial</label>
-                    <p className="text-[#3a210c]">{animal.pesoInicial} kg</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600">Raza</label>
-                    <p className="text-[#3a210c]">{extendedAnimal.raza}</p>
-                  </div>
-                </div>
+                )}
               </CardContent>
             </Card>
 
@@ -383,13 +544,34 @@ const AnimalProfileScreen: React.FC<Props> = ({ animal, onBack }) => {
         </Tabs>
       </div>
 
-      {/* FAB for editing */}
-      <Button
-        size="lg"
-        className="fixed bottom-7 right-7 z-40 rounded-full bg-[#ac815d] hover:bg-[#3a210c] text-white shadow-lg w-16 h-16 flex items-center justify-center"
-      >
-        <Edit className="w-6 h-6" />
-      </Button>
+      {/* Action Buttons */}
+      {editing ? (
+        <div className="fixed bottom-6 left-4 right-4 z-40 flex space-x-3">
+          <Button
+            onClick={handleCancel}
+            variant="outline"
+            className="flex-1 border-[#d9534f] text-[#d9534f] bg-white"
+          >
+            <X className="w-4 h-4 mr-2" />
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleSave}
+            className="flex-1 bg-[#ac815d] hover:bg-[#3a210c] text-white"
+          >
+            <Check className="w-4 h-4 mr-2" />
+            Guardar cambios
+          </Button>
+        </div>
+      ) : (
+        <Button
+          size="lg"
+          className="fixed bottom-7 right-7 z-40 rounded-full bg-[#ac815d] hover:bg-[#3a210c] text-white shadow-lg w-16 h-16 flex items-center justify-center"
+          onClick={handleEdit}
+        >
+          <Edit className="w-6 h-6" />
+        </Button>
+      )}
     </div>
   );
 };
