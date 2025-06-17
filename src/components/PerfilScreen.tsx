@@ -21,6 +21,7 @@ const initialProfile = {
   phone: "71234567",
   name: "Juan Pérez"
 };
+
 const initialFinca = {
   nombre: "El Progreso",
   ubicacion: "Tarija – Tarija",
@@ -35,7 +36,7 @@ const propOptions = [
   "Doble propósito"
 ];
 
-export default function PerfilScreen({ onBack }: PerfilScreenProps) => {
+export default function PerfilScreen({ onBack }: PerfilScreenProps) {
   const [editing, setEditing] = useState(false);
   const [profile, setProfile] = useState(initialProfile);
   const [profileErrors, setProfileErrors] = useState<{ [key: string]: string }>({});
@@ -57,6 +58,7 @@ export default function PerfilScreen({ onBack }: PerfilScreenProps) => {
     if (!p.name) e.name = "Requerido";
     return e;
   }
+
   function validateFinca(f: typeof finca) {
     const e: { [key: string]: string } = {};
     if (!f.nombre) e.nombre = "Requerido";
