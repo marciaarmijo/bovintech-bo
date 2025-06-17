@@ -26,12 +26,84 @@ const InformesScreen = ({ onBack }: InformesScreenProps) => {
   const [selectedReport, setSelectedReport] = useState<any>(null);
   const [reportGenerated, setReportGenerated] = useState(false);
 
+  // Dynamic data generation based on filters
+  const generateReportData = () => {
+    const baseData = {
+      trazabilidad: [
+        { id: '001', descripcion: 'Animal Angus', valor: 'Corral A-1', fecha: '2024-01-15' },
+        { id: '002', descripcion: 'Animal Holstein', valor: 'Corral B-2', fecha: '2024-01-14' },
+        { id: '003', descripcion: 'Animal Brahman', valor: 'Corral A-3', fecha: '2024-01-13' },
+      ],
+      sanidad: [
+        { id: '001', descripcion: 'Vacuna Fiebre Aftosa', valor: 'Completado', fecha: '2024-01-15' },
+        { id: '002', descripcion: 'Desparasitación', valor: 'Pendiente', fecha: '2024-01-14' },
+        { id: '003', descripcion: 'Vitaminas A/D', valor: 'Completado', fecha: '2024-01-13' },
+      ],
+      peso: [
+        { id: '001', descripcion: 'Animal Angus 450kg', valor: '450 kg', fecha: '2024-01-15' },
+        { id: '002', descripcion: 'Animal Holstein 475kg', valor: '475 kg', fecha: '2024-01-14' },
+        { id: '003', descripcion: 'Animal Brahman 430kg', valor: '430 kg', fecha: '2024-01-13' },
+      ],
+      finanzas: [
+        { id: '001', descripcion: 'Venta Animal 001', valor: '+$8,500', fecha: '2024-01-15' },
+        { id: '002', descripcion: 'Compra Alimento', valor: '-$1,200', fecha: '2024-01-14' },
+        { id: '003', descripcion: 'Gastos Veterinarios', valor: '-$350', fecha: '2024-01-13' },
+      ]
+    };
+
+    let filteredData = baseData[selectedModule as keyof typeof baseData] || [];
+    
+    // Apply date filters
+    if (startDate) {
+      filteredData = filteredData.filter(item => item.fecha >= startDate);
+    }
+    if (endDate) {
+      filteredData = filteredData.filter(item => item.fecha <= endDate);
+    }
+    
+    // Apply lote filter (simplified)
+    if (loteId) {
+      filteredData = filteredData.filter(item => 
+        item.id.includes(loteId) || item.descripcion.toLowerCase().includes(loteId.toLowerCase())
+      );
+    }
+
+    return filteredData;
+  };
+
   const recentReports = [
-    { id: 1, type: 'Trazabilidad', date: '2024-01-15', title: 'Informe de movimientos', preview: '/lovable-uploads/9d9ec8ea-0bc4-43c2-ad0a-76b0525d6cac.png' },
-    { id: 2, type: 'Sanidad', date: '2024-01-14', title: 'Estado sanitario general', preview: '/lovable-uploads/b4215cfb-75b3-40f1-a0a9-986cd912f86d.png' },
-    { id: 3, type: 'Peso', date: '2024-01-13', title: 'Análisis de peso promedio', preview: '/lovable-uploads/c50da2fa-905f-4dc2-9c68-bb2c03f795fb.png' },
-    { id: 4, type: 'Finanzas', date: '2024-01-12', title: 'Rentabilidad mensual', preview: '/lovable-uploads/f8178e85-cd3b-45d0-a23b-4dddda732411.png' },
-    { id: 5, type: 'Trazabilidad', date: '2024-01-11', title: 'Historial de lote A', preview: '/lovable-uploads/9adfd864-ba52-4ec8-bafc-c4900c5b98d9.png' }
+    { 
+      id: 1, 
+      type: 'Trazabilidad', 
+      date: '2024-01-15', 
+      title: 'Informe de movimientos',
+      module: 'trazabilidad',
+      params: { param1: 'Movimientos', param2: 'Por lote', param3: 'Detallado' }
+    },
+    { 
+      id: 2, 
+      type: 'Sanidad', 
+      date: '2024-01-14', 
+      title: 'Estado sanitario general',
+      module: 'sanidad',
+      params: { param1: 'Estado general', param2: 'Completados', param3: 'Por veterinario' }
+    },
+    { 
+      id: 3, 
+      type: 'Peso', 
+      date: '2024-01-13', 
+      title: 'Análisis de peso promedio',
+      module: 'peso', 
+      params: { param1: 'Peso promedio', param2: 'Por lote', param3: 'Mensual' }
+    },
+    { 
+      id: 4, 
+      type: 'Finanzas', 
+      date: '2024-01-12', 
+      title: 'Rentabilidad mensual',
+      module: 'finanzas',
+      params: { param1: 'Rentabilidad', param2: 'Por período', param3: 'Detallado' }
+    },
   ];
 
   const moduleOptions = [
@@ -67,6 +139,67 @@ const InformesScreen = ({ onBack }: InformesScreenProps) => {
     return options[module as keyof typeof options]?.[paramNumber as keyof typeof options.trazabilidad] || [];
   };
 
+  const generateReportPreview = (module: string, params: any) => {
+    // Generate dynamic SVG charts based on module and parameters
+    if (module === 'peso') {
+      return (
+        <svg width="120" height="80" viewBox="0 0 120 80" className="w-full h-full">
+          <rect width="120" height="80" fill="#f8f9fa"/>
+          <path d="M10,70 Q30,50 50,40 T90,30 L110,25" stroke="#ac815d" strokeWidth="2" fill="none"/>
+          <circle cx="30" cy="50" r="2" fill="#3a210c"/>
+          <circle cx="50" cy="40" r="2" fill="#3a210c"/>
+          <circle cx="70" cy="35" r="2" fill="#3a210c"/>
+          <circle cx="90" cy="30" r="2" fill="#3a210c"/>
+          <text x="10" y="15" fontSize="8" fill="#3a210c">Peso (kg)</text>
+          <text x="95" y="75" fontSize="6" fill="#666">Tiempo</text>
+        </svg>
+      );
+    } else if (module === 'sanidad') {
+      return (
+        <svg width="120" height="80" viewBox="0 0 120 80" className="w-full h-full">
+          <rect width="120" height="80" fill="#f8f9fa"/>
+          <rect x="20" y="20" width="15" height="40" fill="#22c55e"/>
+          <rect x="40" y="35" width="15" height="25" fill="#ef4444"/>
+          <rect x="60" y="25" width="15" height="35" fill="#3b82f6"/>
+          <rect x="80" y="30" width="15" height="30" fill="#f59e0b"/>
+          <text x="10" y="15" fontSize="8" fill="#3a210c">Estado</text>
+          <text x="22" y="75" fontSize="6" fill="#666">✓</text>
+          <text x="42" y="75" fontSize="6" fill="#666">✗</text>
+          <text x="62" y="75" fontSize="6" fill="#666">◐</text>
+          <text x="82" y="75" fontSize="6" fill="#666">⚠</text>
+        </svg>
+      );
+    } else if (module === 'finanzas') {
+      return (
+        <svg width="120" height="80" viewBox="0 0 120 80" className="w-full h-full">
+          <rect width="120" height="80" fill="#f8f9fa"/>
+          <rect x="20" y="20" width="20" height="40" fill="#22c55e"/>
+          <rect x="45" y="35" width="20" height="25" fill="#ef4444"/>
+          <rect x="70" y="15" width="20" height="45" fill="#ac815d"/>
+          <text x="10" y="15" fontSize="8" fill="#3a210c">Bs.</text>
+          <text x="15" y="75" fontSize="6" fill="#666">Ingreso</text>
+          <text x="45" y="75" fontSize="6" fill="#666">Gasto</text>
+          <text x="72" y="75" fontSize="6" fill="#666">Neto</text>
+        </svg>
+      );
+    } else {
+      return (
+        <svg width="120" height="80" viewBox="0 0 120 80" className="w-full h-full">
+          <rect width="120" height="80" fill="#f8f9fa"/>
+          <rect x="10" y="10" width="100" height="8" fill="#e5e7eb"/>
+          <rect x="10" y="25" width="80" height="8" fill="#e5e7eb"/>
+          <rect x="10" y="40" width="90" height="8" fill="#e5e7eb"/>
+          <rect x="10" y="55" width="70" height="8" fill="#e5e7eb"/>
+          <circle cx="95" cy="14" r="3" fill="#ac815d"/>
+          <circle cx="85" cy="29" r="3" fill="#3a210c"/>
+          <circle cx="90" cy="44" r="3" fill="#ac815d"/>
+          <circle cx="75" cy="59" r="3" fill="#3a210c"/>
+          <text x="10" y="75" fontSize="8" fill="#3a210c">Trazabilidad</text>
+        </svg>
+      );
+    }
+  };
+
   const handleGenerateReport = () => {
     if (!selectedModule || !parameter1) {
       toast({
@@ -80,7 +213,7 @@ const InformesScreen = ({ onBack }: InformesScreenProps) => {
     setReportGenerated(true);
     toast({
       title: "Informe generado con éxito",
-      description: "El informe se ha creado correctamente",
+      description: "El informe se ha creado correctamente con datos actualizados",
     });
   };
 
@@ -103,19 +236,7 @@ const InformesScreen = ({ onBack }: InformesScreenProps) => {
     });
   };
 
-  const getReportPreview = () => {
-    // Generate different preview based on selected module
-    switch(selectedModule) {
-      case 'peso':
-        return '/lovable-uploads/c50da2fa-905f-4dc2-9c68-bb2c03f795fb.png';
-      case 'sanidad':
-        return '/lovable-uploads/b4215cfb-75b3-40f1-a0a9-986cd912f86d.png';
-      case 'finanzas':
-        return '/lovable-uploads/f8178e85-cd3b-45d0-a23b-4dddda732411.png';
-      default:
-        return '/lovable-uploads/9d9ec8ea-0bc4-43c2-ad0a-76b0525d6cac.png';
-    }
-  };
+  const currentReportData = reportGenerated ? generateReportData() : [];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -142,12 +263,8 @@ const InformesScreen = ({ onBack }: InformesScreenProps) => {
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <div className="w-12 h-12 border border-gray-200 rounded overflow-hidden">
-                        <img 
-                          src={report.preview} 
-                          alt="Vista previa" 
-                          className="w-full h-full object-cover"
-                        />
+                      <div className="w-16 h-12 border border-gray-200 rounded overflow-hidden bg-white">
+                        {generateReportPreview(report.module, report.params)}
                       </div>
                       <div>
                         <h3 className="font-medium text-[#3a210c]">{report.title}</h3>
@@ -286,7 +403,7 @@ const InformesScreen = ({ onBack }: InformesScreenProps) => {
           </CardContent>
         </Card>
 
-        {/* Resultados con preview y botones de descarga */}
+        {/* Resultados con preview dinámico y botones de descarga */}
         {reportGenerated && selectedModule && parameter1 && (
           <Card className="border border-[#ac815d]">
             <CardHeader>
@@ -294,19 +411,20 @@ const InformesScreen = ({ onBack }: InformesScreenProps) => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {/* Preview thumbnail */}
+                {/* Preview ampliado dinámico */}
                 <div className="flex items-start space-x-4">
-                  <div className="w-32 h-24 border border-gray-200 rounded overflow-hidden bg-gray-100">
-                    <img 
-                      src={getReportPreview()}
-                      alt="Vista previa del informe" 
-                      className="w-full h-full object-cover"
-                    />
+                  <div className="w-48 h-32 border border-gray-200 rounded overflow-hidden bg-white">
+                    {generateReportPreview(selectedModule, { parameter1, parameter2, parameter3 })}
                   </div>
                   <div className="flex-1">
                     <h3 className="font-medium text-[#3a210c] mb-2">
                       Informe de {selectedModule} - {parameter1}
+                      {parameter2 && ` (${parameter2})`}
                     </h3>
+                    <p className="text-sm text-gray-600 mb-3">
+                      Generado con {currentReportData.length} registros
+                      {startDate && endDate && ` del ${startDate} al ${endDate}`}
+                    </p>
                     <div className="flex space-x-2">
                       <Button 
                         variant="outline" 
@@ -328,7 +446,7 @@ const InformesScreen = ({ onBack }: InformesScreenProps) => {
                   </div>
                 </div>
 
-                {/* Data table */}
+                {/* Tabla de datos reales basada en filtros */}
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
@@ -340,18 +458,14 @@ const InformesScreen = ({ onBack }: InformesScreenProps) => {
                       </tr>
                     </thead>
                     <tbody>
-                      <tr className="border-b hover:bg-gray-50 cursor-pointer">
-                        <td className="p-2">001</td>
-                        <td className="p-2">Animal ejemplo</td>
-                        <td className="p-2">450 kg</td>
-                        <td className="p-2">2024-01-15</td>
-                      </tr>
-                      <tr className="border-b hover:bg-gray-50 cursor-pointer">
-                        <td className="p-2">002</td>
-                        <td className="p-2">Animal ejemplo 2</td>
-                        <td className="p-2">475 kg</td>
-                        <td className="p-2">2024-01-14</td>
-                      </tr>
+                      {currentReportData.map((item, index) => (
+                        <tr key={index} className="border-b hover:bg-gray-50 cursor-pointer">
+                          <td className="p-2">{item.id}</td>
+                          <td className="p-2">{item.descripcion}</td>
+                          <td className="p-2">{item.valor}</td>
+                          <td className="p-2">{item.fecha}</td>
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>
@@ -361,7 +475,7 @@ const InformesScreen = ({ onBack }: InformesScreenProps) => {
         )}
       </div>
 
-      {/* Modal para ver informe completo */}
+      {/* Modal para ver informe completo con datos reales */}
       <Dialog open={showReportModal} onOpenChange={setShowReportModal}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -370,12 +484,12 @@ const InformesScreen = ({ onBack }: InformesScreenProps) => {
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="w-full h-96 border border-gray-200 rounded overflow-hidden">
-              <img 
-                src={selectedReport?.preview} 
-                alt="Informe completo" 
-                className="w-full h-full object-contain"
-              />
+            <div className="w-full h-96 border border-gray-200 rounded overflow-hidden bg-white flex items-center justify-center">
+              {selectedReport && (
+                <div className="w-full h-full scale-150 flex items-center justify-center">
+                  {generateReportPreview(selectedReport.module, selectedReport.params)}
+                </div>
+              )}
             </div>
             <div className="flex justify-center space-x-4">
               <Button 

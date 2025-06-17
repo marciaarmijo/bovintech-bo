@@ -26,10 +26,10 @@ const BovinTechScreen = ({ onBack }: BovinTechScreenProps) => {
       </header>
 
       <div className="p-4 space-y-6">
-        {/* BovinTech Logo Header */}
-        <div className="flex justify-center mb-6">
+        {/* BovinTech Logo Header - Centered with proper spacing */}
+        <div className="flex justify-center mb-4">
           <img 
-            src="/lovable-uploads/41814dda-1c48-4ebb-844f-ede5680e1492.png" 
+            src="/lovable-uploads/308ded64-f048-4a9c-bc82-a5c74db64321.png" 
             alt="BovinTech Logo" 
             className="w-20 h-auto"
           />
