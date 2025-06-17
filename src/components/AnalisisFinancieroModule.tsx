@@ -82,9 +82,9 @@ const AnalisisFinancieroModule = ({ onBack }: AnalisisFinancieroModuleProps) => 
     return allTransactions.filter(transaction => {
       if (filters.startDate && transaction.fecha < filters.startDate) return false;
       if (filters.endDate && transaction.fecha > filters.endDate) return false;
-      if (filters.lote && transaction.lote !== filters.lote) return false;
-      if (filters.tipo && transaction.tipo !== filters.tipo) return false;
-      if (filters.categoria && transaction.categoria !== filters.categoria) return false;
+      if (filters.lote && filters.lote !== 'all' && transaction.lote !== filters.lote) return false;
+      if (filters.tipo && filters.tipo !== 'all' && transaction.tipo !== filters.tipo) return false;
+      if (filters.categoria && filters.categoria !== 'all' && transaction.categoria !== filters.categoria) return false;
       return true;
     });
   }, [filters]);
@@ -184,7 +184,7 @@ const AnalisisFinancieroModule = ({ onBack }: AnalisisFinancieroModuleProps) => 
                       <SelectValue placeholder="Todos" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Todos</SelectItem>
+                      <SelectItem value="all">Todos</SelectItem>
                       {lotes.map(lote => (
                         <SelectItem key={lote} value={lote}>{lote}</SelectItem>
                       ))}
@@ -199,7 +199,7 @@ const AnalisisFinancieroModule = ({ onBack }: AnalisisFinancieroModuleProps) => 
                       <SelectValue placeholder="Todos" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Todos</SelectItem>
+                      <SelectItem value="all">Todos</SelectItem>
                       <SelectItem value="Ingreso">Ingreso</SelectItem>
                       <SelectItem value="Gasto">Gasto</SelectItem>
                     </SelectContent>
@@ -213,7 +213,7 @@ const AnalisisFinancieroModule = ({ onBack }: AnalisisFinancieroModuleProps) => 
                       <SelectValue placeholder="Todas" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Todas</SelectItem>
+                      <SelectItem value="all">Todas</SelectItem>
                       {categorias.map(categoria => (
                         <SelectItem key={categoria} value={categoria}>{categoria}</SelectItem>
                       ))}
