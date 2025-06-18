@@ -10,7 +10,7 @@ interface BovinTechScreenProps {
 
 const BovinTechScreen = ({ onBack }: BovinTechScreenProps) => {
   const handleWhatsAppSupport = () => {
-    window.open('https://wa.me/59170012345', '_blank');
+    window.open('https://wa.me/34615707910', '_blank');
   };
 
   return (
@@ -86,7 +86,7 @@ const BovinTechScreen = ({ onBack }: BovinTechScreenProps) => {
                 <Phone className="h-5 w-5 text-[#ac815d]" />
                 <div>
                   <p className="text-sm font-medium text-[#3a210c]">Teléfono</p>
-                  <p className="text-sm text-gray-600">+591 700-12345</p>
+                  <p className="text-sm text-gray-600">+34 615707910</p>
                 </div>
               </div>
             </div>
